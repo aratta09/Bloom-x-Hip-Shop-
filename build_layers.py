@@ -670,14 +670,21 @@ def main() -> None:
         "sprite_opt_talk.png",
         "sprite_opt_exit.png",
         "sprite_gold_49.png",
-        "bgm.m4a",
+        "bgm_shop.mp3",
     ]
     bundle = {}
     for fname in files:
         p = ASSETS_DIR / fname
         b64 = base64.b64encode(p.read_bytes()).decode("ascii")
-        mime = "audio/mp4" if fname.endswith(".m4a") else "image/png"
-        key = fname.rsplit(".", 1)[0]
+        if fname.endswith(".mp3"):
+            mime = "audio/mpeg"
+            key = "bgm"
+        elif fname.endswith(".m4a"):
+            mime = "audio/mp4"
+            key = "bgm"
+        else:
+            mime = "image/png"
+            key = fname.rsplit(".", 1)[0]
         bundle[key] = f"data:{mime};base64,{b64}"
 
     js_content = "window.BLOOM_SHOP_METRICS = " + json.dumps(metrics) + ";\n"
