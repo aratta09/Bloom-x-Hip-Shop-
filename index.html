@@ -226,43 +226,6 @@
       text-shadow: -1px 0 0 #00e5ff, 1px 0 0 #ff2a3a;
     }
 
-    .praise-box {
-      padding: 7px 8px;
-      background: #050618;
-      border: 1px dashed #4e629e;
-      font-size: 12px;
-    }
-
-    .praise-head {
-      display: flex;
-      justify-content: space-between;
-      color: #ffee66;
-      margin-bottom: 5px;
-    }
-
-    .pixel-bar-Blocks {
-      display: grid;
-      grid-template-columns: repeat(10, 1fr);
-      gap: 3px;
-      height: 11px;
-    }
-
-    .pixel-bar-Blocks span {
-      background: #141936;
-      border: 1px solid #323f73;
-    }
-
-    .pixel-bar-Blocks span.on {
-      background: #00e5ff;
-      border-color: #ffffff;
-      box-shadow: 1px 0 0 #ff2a3a;
-    }
-
-    .pixel-bar-Blocks.gold span.on {
-      background: #ffe047;
-      border-color: #ffffff;
-    }
-
     /* Left Wing: Sketchbook Fil-dam Widget */
     .sketchbook-page {
       background: #06071c;
@@ -832,7 +795,7 @@
   <!-- Animated Pixel-Art Gothic Prison Cell & Starlight Background -->
   <canvas id="bg-sanctum-canvas" aria-hidden="true"></canvas>
 
-  <div class="sanctum-stage" id="sanctum-stage">
+  <div class="sanctum-stage focus-crt" id="sanctum-stage">
     <!-- ===================================================================
          LEFT WING: PRISONER #660 DOSSIER & ANAN'S FIL-DAM SKETCHBOOK
          =================================================================== -->
@@ -887,17 +850,6 @@
           <div class="lore-row">
             <span class="lore-label">현재 표정</span>
             <span class="lore-val" id="anan-expr-badge">기본 (깜박임)</span>
-          </div>
-        </div>
-
-        <div class="praise-box">
-          <div class="praise-head">
-            <span>★ 고독 · 망상 몰입도</span>
-            <span id="praise-pct">70%</span>
-          </div>
-          <div class="pixel-bar-Blocks gold" id="praise-bar">
-            <span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span>
-            <span class="on"></span><span class="on"></span><span></span><span></span><span></span>
           </div>
         </div>
       </section>
@@ -962,7 +914,7 @@
             <span class="heart-ico">♥</span>
             <span id="lbl-lang">언어: KR</span>
           </button>
-          <button class="px-btn active" id="btn-open-cfg" type="button" title="좌우 배경패널 및 설정창 ON/OFF">
+          <button class="px-btn" id="btn-open-cfg" type="button" title="좌우 배경패널 및 설정창 ON/OFF">
             <span class="heart-ico">♥</span>
             <span>◆ 설정창</span>
           </button>
@@ -1084,15 +1036,15 @@
               <span class="heart-ico">♥</span><span>★ 1:1 초기화</span>
             </button>
             <button class="px-btn" id="cfg-btn-wings" type="button">
-              <span class="heart-ico">♥</span><span id="lbl-wings">▣ 배경패널 접기</span>
+              <span class="heart-ico">♥</span><span id="lbl-wings">▣ 배경패널 표시</span>
             </button>
           </div>
         </div>
 
         <div class="key-guide">
           <div>＊ <b>방향키 / 마우스</b> : 상점 메뉴 이동</div>
-          <div>＊ <b>마우스 휠</b> : FOV 조절 (배경 원근 줌)</div>
-          <div>＊ <b>Z / Enter / 클릭</b> : 선택 및 대화 · <b>H</b> : 패널 토글</div>
+          <div>＊ <b>Z / Enter / 클릭</b> : 선택 · <b>X / Esc</b> : 뒤로가기</div>
+          <div>＊ <b>휠</b> : FOV 조절 · <b>H</b> : 설정/배경패널 토글</div>
         </div>
       </section>
     </aside>
@@ -1154,7 +1106,7 @@
         cameraMode: urlParams.get("float") === "0" ? "LOCK" : "AUTO", // 'AUTO', 'MOUSE', 'LOCK'
         crtEnabled: true,
         powerOn: true,
-        wingsHidden: false,
+        wingsHidden: urlParams.get("wings") !== "1",
         lang: urlParams.get("lang") === "jp" ? "JP" : "KR",
         showMainKrSub: false,
         depthMult: parseFloat(urlParams.get("depth") ?? "1.0"),
@@ -1163,7 +1115,6 @@
         bgmUserMuted: false,
         bgmPendingAutoplay: false,
         bgmResumeOnPowerOn: true,
-        praiseScore: 70,
         sketchIdx: 0,
         clickExprIdx: 0,
         charClickCount: 0,
@@ -1178,6 +1129,7 @@
         bgmPlaying: false,
         beatEnergy: 0,
         shopMode: initMode, // 'MAIN', 'BUY', 'TALK', 'MESSAGE'
+        dialogueReturnMode: "MAIN",
         mainCursor: 0,
         subCursor: 0,
         talkPage: 0,
@@ -1350,19 +1302,19 @@
               bought: false,
             },
             {
-              name: "알리바이 정리 노트",
+              name: "모임 일정 정리 수첩",
               price: 14,
-              desc: "＊ 수감자들의 증언과\n   행적을 정리한 노트.\n   빈틈없이 적혀 있다.",
+              desc: "＊ 차 모임과 주말\n   약속을 적은 수첩.\n   꼼꼼히 적혀 있다.",
               steps: [
                 {
                   expr: "sketchbook",
-                  text: "＊ 『모두의 알리바이는 이몸이\n   정리해 두었다. 궁금하다면\n   이걸 보도록 해라』",
-                  statusKr: "알리바이 기록을 제시하는 중",
-                  statusJp: "アリバイ記録を提示中",
+                  text: "＊ 『다들 각자 바빠서 이몸이\n   모임 날짜를 정리해 두었다.\n   잊지 말고 보도록 해라』",
+                  statusKr: "모임 일정 수첩을 펼쳐 보임",
+                  statusJp: "集まりの予定帳を見せている",
                 },
                 {
                   expr: "wide_eyes",
-                  text: "＊ 『추측만 늘어놓기 전에\n   머리를 좀 써라.\n   뇌는 장식인가?』",
+                  text: "＊ 『질문만 늘어놓기 전에\n   달력부터 좀 봐라.\n   스케줄표는 장식인가?』",
                   statusKr: "눈을 크게 뜨고 일침을 가하는 중",
                   statusJp: "目を見開いて一喝している",
                 },
@@ -1406,9 +1358,9 @@
                   },
                   {
                     expr: "one_sleeve",
-                    text: "＊ 『이몸의 마법은 원치 않는 죽음을\n   선사하는 그런 것이 아니다.\n   엉뚱한 의심은 그만두도록 하게나』",
-                    statusKr: "한쪽 소매로 가리며 반박하는 중",
-                    statusJp: "片袖で口元を隠して反論中",
+                    text: "＊ 『요즘은 밤늦도록 놀다 가는\n   녀석들을 일찍 재울 때나 가끔\n   쓸 뿐이니 안심하도록 해라』",
+                    statusKr: "한쪽 소매로 가리며 해명하는 중",
+                    statusJp: "片袖で口元を隠して説明中",
                   },
                 ],
               },
@@ -1430,7 +1382,7 @@
                 ],
               },
               {
-                title: "▸ 다음 대화 목록 (1/5)",
+                title: "▸ 다음 대화 목록 (1/9)",
                 isNextPage: true,
               },
             ],
@@ -1469,7 +1421,7 @@
                     speaker: "noah",
                     guestChar: "noah",
                     guestExpr: "angry",
-                    text: "＊ [노아] 뿌우―. 안안 쨩이 무섭지\n   않게 부적 그려준 건데!\n   그림 못 그리면 못 산단 말야!",
+                    text: "＊ [노아] 뿌우―. 안안 쨩 악몽\n   꾸지 말라고 부적 그려준 건데!\n   그림 못 그리면 못 산단 말야!",
                     statusKr: "노아가 볼을 부풀리며 토라지는 중",
                     statusJp: "ノアがむーっと頬を膨らませている",
                   },
@@ -1512,43 +1464,43 @@
                   },
                   {
                     expr: "worried",
-                    text: "＊ ……아니다. 고백한다.\n   잘 써지지 않아서…… 도서실에서\n   히로가 같이 작업해 주었다…….",
+                    text: "＊ ……아니다. 고백한다.\n   잘 써지지 않아서…… 도서관에서\n   히로가 같이 작업해 주었다…….",
                     statusKr: "히로가 도와줬다고 실토하는 중",
                     statusJp: "ヒロに手伝ってもらったと告白中",
                   },
                 ],
               },
               {
-                title: "감옥 저택에서의 생활",
+                title: "조용한 은신처의 하루",
                 steps: [
                   {
                     expr: "sleepy",
                     speaker: "anan",
                     guestChar: null,
-                    text: "＊ 이몸이 진정으로 바라는 것은\n   심원한 고독과 정적……!\n   여기서 사는 편이 편할지도 모른다.",
-                    statusKr: "심원한 고독과 정적을 갈망 중",
-                    statusJp: "深遠なる孤独と静寂を求めている",
+                    text: "＊ 이몸이 진정으로 바라는 것은\n   조용히 원고를 쓸 수 있는 방과\n   따뜻한 홍차 한 잔뿐이다……!",
+                    statusKr: "조용한 일상과 휴식을 즐기는 중",
+                    statusJp: "静かな日常を満喫している",
                   },
                   {
                     expr: "calm",
                     speaker: "anan",
                     guestChar: null,
-                    text: "＊ 식사도 의외로 입에 맞고,\n   조용히 각본을 구상하기에\n   나쁘지 않은 환경이기는 하다.",
-                    statusKr: "감옥 저택의 일상을 회상 중",
-                    statusJp: "牢屋敷での日々を回想中",
+                    text: "＊ 예전엔 혼자 있는 편이 무조건\n   편하다고 믿었는데, 요즘은 다들\n   시시콜콜 찾아오니 신기하군.",
+                    statusKr: "바뀐 일상을 가만히 떠올림",
+                    statusJp: "変わった日常を思い返している",
                   },
                   {
                     expr: "proud_blush",
                     speaker: "anan",
                     guestChar: null,
-                    text: "＊ 하지만 이곳에서 처음으로 누군가가\n   곁에 있어 주었다. 말하지 않아도,\n   친구가 되어 주었다…!",
-                    statusKr: "감옥에서 만난 친구들을 떠올림",
-                    statusJp: "牢屋敷の友だちを思い出している",
+                    text: "＊ 말하지 않아도 불쑥 들러서\n   안부를 묻는 친구들이 생겼으니…\n   지금 생활도 꽤 나쁘지 않다!",
+                    statusKr: "소중한 친구들과의 현재를 미소 지음",
+                    statusJp: "大切な友達との今に微笑む",
                   },
                 ],
               },
               {
-                title: "▸ 다음 대화 목록 (2/5)",
+                title: "▸ 다음 대화 목록 (2/9)",
                 isNextPage: true,
               },
             ],
@@ -1560,9 +1512,9 @@
                     expr: "worried",
                     speaker: "anan",
                     guestChar: null,
-                    text: "＊ 각본…… 미리아와 조금 썼다.\n   그 녀석은 영화를 좋아했지……\n   이몸과 함께 영화를 봐 주었다.",
-                    statusKr: "미리아와 영화 보던 날을 회상 중",
-                    statusJp: "ミリアと映画を見た日々を回想中",
+                    text: "＊ 요즘 미리아와 자주 영화를 본다.\n   그 녀석이 추천해 주는 작품은\n   의외로 각본 구상에 도움이 되지.",
+                    statusKr: "미리아와 볼 영화를 고르는 중",
+                    statusJp: "ミリアと見る映画を選んでいる",
                   },
                   {
                     expr: "wide_eyes",
@@ -1613,9 +1565,9 @@
                     expr: "proud_blush",
                     speaker: "anan",
                     guestChar: null,
-                    text: "＊ 흥…… 겁쟁이 녀석 같으니.\n   노아나 레이아, 미리아와\n   함께하는 시간이 정말 좋았다.",
-                    statusKr: "소중한 친구들과의 시간을 그리워함",
-                    statusJp: "みんなといる時間が好きだった",
+                    text: "＊ 흥…… 겁쟁이 녀석 같으니.\n   그래도 노아나 레이아, 미리아랑\n   함께 노는 주말은 늘 기대된다.",
+                    statusKr: "친구들과 놀 주말을 기대하는 중",
+                    statusJp: "みんなと遊ぶ休日を楽しみに中",
                   },
                 ],
               },
@@ -1694,7 +1646,7 @@
                 ],
               },
               {
-                title: "▸ 다음 대화 목록 (3/5)",
+                title: "▸ 다음 대화 목록 (3/9)",
                 isNextPage: true,
               },
             ],
@@ -1717,15 +1669,15 @@
                 ],
               },
               {
-                title: "마녀재판과 추리",
+                title: "사라진 푸딩과 명탐정",
                 steps: [
                   {
                     expr: "one_sleeve",
                     speaker: "anan",
                     guestChar: null,
-                    text: "＊ ……누가 범인이든 상관없다.\n   하지만 억울한 누명은 사양이다.\n   모두의 알리바이는 정리해 뒀지.",
-                    statusKr: "한쪽 소매로 입을 가리고 경계 중",
-                    statusJp: "片袖で口元を隠して警戒中",
+                    text: "＊ ……누구냐, 냉장고에 넣어둔\n   이몸의 특제 푸딩을 몰래 먹은\n   간 큰 녀석은. 가만 안 둔다.",
+                    statusKr: "사라진 푸딩 때문에 예민해짐",
+                    statusJp: "消えたプリンに厳戒態勢中",
                   },
                   {
                     expr: "surprised",
@@ -1741,7 +1693,7 @@
                     speaker: "sherry",
                     guestChar: "sherry",
                     guestExpr: "pensive",
-                    text: "＊ [셰리] 흐음… 안안 씨 표정이\n   수상한걸요? 혹시 숨겨둔 간식\n   트릭이라도 있는 건 아닌지~!",
+                    text: "＊ [셰리] 흐음… 안안 씨 입가에\n   달콤한 흔적이?! 혹시 본인이 먹고\n   까먹은 트릭은 아닌가요~!",
                     statusKr: "셰리가 진지하게 턱을 괴고 추리 중",
                     statusJp: "シェリーが顎に手を当て推理中",
                   },
@@ -1750,7 +1702,7 @@
                     speaker: "anan",
                     guestChar: "sherry",
                     guestExpr: "explain",
-                    text: "＊ [안안] 쓸데없는 추리 하지 마라!\n   『어차피 범인은 이몸의 【세뇌】로\n   자백시킬 수 있을 뿐이다!』",
+                    text: "＊ [안안] 엉뚱한 추리 하지 마라!\n   『범인은 이몸의 특제 유자차로\n   어차피 금방 불게 만들 테다!』",
                     statusKr: "셰리의 엉뚱한 추리에 반박 중",
                     statusJp: "シェリーの珍推理にツッコミ中",
                   },
@@ -1759,30 +1711,30 @@
                     speaker: "sherry",
                     guestChar: "sherry",
                     guestExpr: "smile",
-                    text: "＊ [셰리] 에헤헤, 그래도 참고로\n   안안 씨는 알리바이가 확실해서\n   믿고 있어요! 명탐정의 보증!",
-                    statusKr: "셰리가 환하게 엄지를 척 세워 보임",
-                    statusJp: "シェリーが満面の笑みで太鼓判！",
+                    text: "＊ [셰리] 에헤헤, 농담이에요!\n   아까 마고가 쟁반에 챙겨가는 걸\n   봤어요! 명탐정의 완벽한 제보!",
+                    statusKr: "셰리가 웃으며 목격담을 제보함",
+                    statusJp: "シェリーが笑いながら証言中",
                   },
                   {
                     expr: "worried",
                     speaker: "anan",
                     guestChar: null,
-                    text: "＊ 시끄러운 탐정 녀석이군…\n   하지만 이몸도 다 같이 무사히\n   이 감옥 저택을 나가고 싶다…….",
-                    statusKr: "수심 어린 눈으로 동료를 걱정 중",
-                    statusJp: "憂いを帯びた目で仲間を案じる",
+                    text: "＊ 어수선한 탐정 놀이였군…\n   하지만 시시한 장난에도 이렇게\n   웃을 수 있는 나날이 좋긴 하군.",
+                    statusKr: "소소한 일상에 살짝 미소 지음",
+                    statusJp: "何気ない日常に目を細める",
                   },
                 ],
               },
               {
-                title: "독방의 망상 세계",
+                title: "방구석의 공상 세계",
                 steps: [
                   {
                     expr: "sleepy",
                     speaker: "anan",
                     guestChar: null,
-                    text: "＊ 마음만 먹으면 독방에서 계속\n   이야기 속 세상을 망상하며\n   그 황홀경 속에서 보낼 수 있다.",
-                    statusKr: "독방의 망상 세계를 이야기하는 중",
-                    statusJp: "独房の微睡みを語っている",
+                    text: "＊ 마음만 먹으면 내 방 구석에서\n   밤새 이야기 속 세상을 떠올리며\n   그 여운 속에 뒹굴거릴 수 있다.",
+                    statusKr: "방구석 공상 세계를 이야기 중",
+                    statusJp: "自室の微睡みを語っている",
                   },
                   {
                     expr: "calm",
@@ -1795,7 +1747,7 @@
                 ],
               },
               {
-                title: "▸ 다음 대화 목록 (4/5)",
+                title: "▸ 다음 대화 목록 (4/9)",
                 isNextPage: true,
               },
             ],
@@ -1902,7 +1854,7 @@
                     speaker: "anan",
                     guestChar: "sherry",
                     guestExpr: "surprised",
-                    text: "＊ [안안] 『기각이다!! 독방이 무너지\n   잖나!』 한나 때처럼 벽 부수고\n   사고 칠 셈이냐!",
+                    text: "＊ [안안] 『기각이다!! 가게가 무너지\n   잖나!』 한나 때처럼 벽 부수면\n   집주인한테 쫓겨난단 말이다!",
                     statusKr: "셰리의 괴력을 필사적으로 제지 중",
                     statusJp: "シェリーの怪力を全力で阻止中",
                   },
@@ -1935,7 +1887,7 @@
                 ],
               },
               {
-                title: "셋이 모이면 독방이 좁다",
+                title: "셋이 모이면 가게가 좁다",
                 steps: [
                   {
                     expr: "sleepy",
@@ -1944,7 +1896,7 @@
                     guest2Char: null,
                     text: "＊ 다들 잠든 깊은 밤……\n   이 정막이야말로 대문호의\n   영감을 깨우는 최고의 시간이다.",
                     statusKr: "조용히 야심한 밤을 음미 중",
-                    statusJp: "静かな深夜の独房を満喫中",
+                    statusJp: "静かな深夜の時間を満喫中",
                   },
                   {
                     expr: "wide_eyes",
@@ -2019,7 +1971,7 @@
                     ananX: -1.48,
                     guestX: -0.02,
                     guest2X: 1.48,
-                    text: "＊ [안안] 『시끄럽군, 독방이 좁다!』\n   한나는 부채 접고 셰리는 돋보기\n   집어넣어라! 적당히들 하거라.",
+                    text: "＊ [안안] 『시끄럽군, 가게가 좁다!』\n   한나는 부채 접고 셰리는 돋보기\n   집어넣어라! 적당히들 하거라.",
                     statusKr: "안안이 둘을 동시에 진정시키는 중",
                     statusJp: "アンアンが2人を一喝している",
                   },
@@ -2042,6 +1994,787 @@
                     text: "＊ ……소란스러운 둘이지만.\n   덕분에 오늘 밤도 심심할 틈은\n   없게 되었군…… 나쁘지 않다.",
                     statusKr: "조용히 미소 지으며 밤을 지새움",
                     statusJp: "密かに微笑んで見送っている",
+                  },
+                ],
+              },
+              {
+                title: "▸ 다음 대화 목록 (5/9)",
+                isNextPage: true,
+              },
+            ],
+            [
+              {
+                title: "에마와 주말 카페 디저트",
+                steps: [
+                  {
+                    expr: "calm",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ ……누구지? 가게 유리문 앞에서\n   작은 종이봉투를 흔드는\n   분홍빛 실루엣이 보이는군.",
+                    statusKr: "문밖의 기척에 고개를 듦",
+                    statusJp: "扉の前の気配に顔を上げる",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "ema",
+                    guestChar: "ema",
+                    guestExpr: "smile",
+                    text: "＊ [에마] 안안 쨩! 잘 지냈어~?\n   오는 길에 벚꽃 모찌가 너무\n   먹음직스러워서 사 왔지!",
+                    statusKr: "에마가 간식 봉투를 들고 활짝 웃음!",
+                    statusJp: "エマがお土産を手に笑顔で登場！",
+                  },
+                  {
+                    expr: "flustered",
+                    speaker: "anan",
+                    guestChar: "ema",
+                    guestExpr: "normal",
+                    text: "＊ [안안] 사, 사쿠라바 에마……?\n   『원고 마감 중인데 갑자기\n   단것 유혹은 반칙이다만』",
+                    statusKr: "디저트 유혹에 살짝 흔들리는 중",
+                    statusJp: "甘い誘惑に少し揺れている",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "ema",
+                    guestChar: "ema",
+                    guestExpr: "surprised",
+                    text: "＊ [에마] 어라, 또 밤새웠어?!\n   안 돼 안 돼! 햇볕도 좀 쬐고\n   따뜻한 거 먹으면서 써야지!",
+                    statusKr: "에마가 밤샘 작업을 걱정하며 챙김",
+                    statusJp: "エマが徹夜続きを心配している",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "ema",
+                    guestChar: "ema",
+                    guestExpr: "determined",
+                    text: "＊ [에마] 다음 휴일엔 다 같이\n   강변 공원 피크닉 가기로 했어!\n   안안 쨩 도시락은 내가 싼다!",
+                    statusKr: "에마가 주말 소풍 계획을 신나게 말함!",
+                    statusJp: "エマが休日のピクニックを約束中！",
+                  },
+                  {
+                    expr: "proud_blush",
+                    speaker: "ema",
+                    guestChar: "ema",
+                    guestExpr: "flushed",
+                    text: "＊ [에마] 에헤헤… 그럼 원고\n   끝나면 꼭 연락해! 벚꽃 사탕도\n   또 사 가지고 놀러 올게~!",
+                    statusKr: "에마가 수줍게 웃으며 인사를 건넴",
+                    statusJp: "エマが照れ笑いしながら手を振る",
+                  },
+                  {
+                    expr: "proud_blush",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ ……눈이 부실 만큼 밝은 녀석.\n   원고 끝나고 먹는 벚꽃 모찌는\n   제법 각별한 맛일 것 같군.",
+                    statusKr: "에마가 준 간식을 보며 미소 지음",
+                    statusJp: "差し入れを見て微笑んでいる",
+                  },
+                ],
+              },
+              {
+                title: "도서관의 빚과 백합 홍차",
+                steps: [
+                  {
+                    expr: "worried",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ ………….\n＊ 『지난번 도서관에서 막혔던\n   원고… 아직 전개가 안 풀린다』",
+                    statusKr: "도서관에서 쓰던 원고를 고민 중",
+                    statusJp: "図書館の原稿を思い返している",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "hiro",
+                    guestChar: "hiro",
+                    guestExpr: "arms_normal",
+                    text: "＊ [히로] 나츠메 안안.\n   이 늦은 밤에 간판 불도 끄고\n   뭘 그리 끙끙거리는 거지?",
+                    statusKr: "니카이도 히로가 팔짱 끼고 등장!",
+                    statusJp: "二階堂ヒロが腕を組んで登場！",
+                  },
+                  {
+                    expr: "flustered",
+                    speaker: "anan",
+                    guestChar: "hiro",
+                    guestExpr: "arms_pensive",
+                    text: "＊ [안안] 히, 히로…! 마침 잘 왔다.\n   『지난번 소설 구성 도와준 빚,\n   이 몸의 말동무로 갚도록 해라』",
+                    statusKr: "안안이 스케치북을 들어 항변 중",
+                    statusJp: "アンアンがスケッチブックで応戦中",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "hiro",
+                    guestChar: "hiro",
+                    guestExpr: "pensive",
+                    text: "＊ [히로] 빚이라니… 네 문체는\n   고집은 세지만 울림이 있더군.\n   적어도 겉치레뿐인 글은 아냐.",
+                    statusKr: "히로가 진지하게 감상을 전함",
+                    statusJp: "ヒロが真剣に感想を伝えている",
+                  },
+                  {
+                    expr: "shy_hide",
+                    speaker: "hiro",
+                    guestChar: "hiro",
+                    guestExpr: "flushed",
+                    text: "＊ [히로] ……너무 늦게까지\n   밤새진 마라. 네 가게… 꽤\n   조용해서 머리 식히긴 좋군.",
+                    statusKr: "히로가 시선을 피하며 살짝 붉어짐",
+                    statusJp: "ヒロが視線を逸らして少し照れる",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "hiro",
+                    guestChar: "hiro",
+                    guestExpr: "arms_smile",
+                    text: "＊ [히로] 다음에 붉은 백합 차라도\n   한 잔 내어다오. 그럼 수고해라,\n   대문호 선생.",
+                    statusKr: "히로가 옅은 미소와 함께 뒤돌아섬",
+                    statusJp: "ヒロが微かな笑みを浮かべて去る",
+                  },
+                  {
+                    expr: "proud_blush",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ ……대문호 선생이라니.\n   엄격한 얼굴 뒤에 저런 의리가\n   있는 녀석이었군.",
+                    statusKr: "히로의 말에 은근히 기뻐하는 중",
+                    statusJp: "ヒロの言葉に密かに喜んでいる",
+                  },
+                ],
+              },
+              {
+                title: "마녀들의 작은 다과회",
+                steps: [
+                  {
+                    expr: "calm",
+                    speaker: "anan",
+                    guestChar: null,
+                    guest2Char: null,
+                    text: "＊ 가끔은 잉크 냄새 대신 따뜻한\n   찻잎 향기 속에서 하루를 정리해\n   보는 것도 나쁘지 않을 터.",
+                    statusKr: "따뜻한 차향을 즐기며 숨을 돌림",
+                    statusJp: "温かいお茶の香りで一息ついている",
+                  },
+                  {
+                    expr: "proud_blush",
+                    speaker: "ema",
+                    guestChar: "ema",
+                    guestExpr: "smile",
+                    guest2Char: null,
+                    text: "＊ [에마] 안안 쨩! 주방에서 구운\n   따끈한 비스킷 가져왔어~! 같이\n   나눠 먹으면 힘이 날 거야!",
+                    statusKr: "에마가 비스킷을 들고 환히 웃음!",
+                    statusJp: "エマが焼きたてのお菓子を持って来た！",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "mago",
+                    guestChar: "ema",
+                    guestExpr: "smile",
+                    guest2Char: "mago",
+                    guest2Expr: "smile",
+                    text: "＊ [마고] 우후후, 좋은 냄새를 따라\n   왔더니 딱 좋네♡ 자, 홍차는 내가\n   완벽한 온도로 우려 줄게?",
+                    statusKr: "마고까지 합류해 다과회가 열림!",
+                    statusJp: "マーゴも合流しお茶会が開かれる！",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "ema",
+                    guestChar: "ema",
+                    guestExpr: "flushed",
+                    guest2Char: "mago",
+                    guest2Expr: "normal",
+                    text: "＊ [에마] 이렇게 셋이 둘러앉아 차를\n   마시니까 하루 피로가 전부\n   사르르 녹는 기분이 들어~!",
+                    statusKr: "에마가 포근한 분위기에 미소 지음",
+                    statusJp: "エマが和やかな空気に笑顔を浮かべる",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "mago",
+                    guestChar: "ema",
+                    guestExpr: "smile",
+                    guest2Char: "mago",
+                    guest2Expr: "flushed",
+                    text: "＊ [마고] 안안 쨩, 오늘은 서비스로\n   내일 대길(大吉) 점괘만 남길게.\n   다들 잘 자렴, 소중한 친구들♡",
+                    statusKr: "마고가 상냥한 미소로 축복을 남김",
+                    statusJp: "マーゴが優しい微笑みで祝福する",
+                  },
+                  {
+                    expr: "proud_blush",
+                    speaker: "anan",
+                    guestChar: null,
+                    guest2Char: null,
+                    text: "＊ ……고맙다, 전부.\n   『네가 찾아와 주었던 덕분에\n   오늘의 밤도 외롭지 않았어』",
+                    statusKr: "모두를 배웅하며 진심을 고백함",
+                    statusJp: "皆を見送り素直な気持ちを綴る",
+                  },
+                ],
+              },
+              {
+                title: "▸ 다음 대화 목록 (6/9)",
+                isNextPage: true,
+              },
+            ],
+            [
+              {
+                title: "코코땅의 상점 브이로그?!",
+                steps: [
+                  {
+                    expr: "calm",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ ……왠지 문 너머에서 요란한\n   전자음과 웅얼거리는 목소리가\n   울려 퍼지고 있는데…….",
+                    statusKr: "수상한 소란에 귀를 쫑긋 세움",
+                    statusJp: "外からの騒がしい声に警戒中",
+                  },
+                  {
+                    expr: "surprised",
+                    speaker: "coco",
+                    guestChar: "coco",
+                    guestExpr: "smile",
+                    text: "＊ [코코] 안녕~ 코코땅이야~!\n   오늘은 우리 전설의 문호(!)\n   안안 쨩 가게 탐방 브이로그!",
+                    statusKr: "코코가 브이 포즈로 돌발 생방 개시!",
+                    statusJp: "ココがVサインで生配信を突撃開始！",
+                  },
+                  {
+                    expr: "angry",
+                    speaker: "anan",
+                    guestChar: "coco",
+                    guestExpr: "normal",
+                    text: "＊ [안안] 『무슨 방송이냐, 나가!』\n   가게 손님 얼굴까지 찍을\n   셈이냐! 무례하기 짝이 없군!",
+                    statusKr: "안안이 황당해하며 호통치는 중",
+                    statusJp: "アンアンが呆れて追い返そうと中",
+                  },
+                  {
+                    expr: "flustered",
+                    speaker: "coco",
+                    guestChar: "coco",
+                    guestExpr: "pensive",
+                    text: "＊ [코코] 아, 아틔시도 알거든?!\n   그래도 카메라 돌리면 마음이\n   놓인단 말야… 구독 눌러줘~?",
+                    statusKr: "코코가 입술을 삐죽이며 투덜거림",
+                    statusJp: "ココが拗ねながらカメラをいじる",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "coco",
+                    guestChar: "coco",
+                    guestExpr: "surprised",
+                    text: "＊ [코코] 헐!? 저기 $49짜리 인형\n   완전 힙해! 아틔시 인형이랑\n   콜라보하면 대박 터지겠는데~!",
+                    statusKr: "코코가 상점 진열품에 눈을 반짝임",
+                    statusJp: "ココが店の品物に目を輝かせる！",
+                  },
+                  {
+                    expr: "smug",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ ……어휴, 5분도 못 돼서\n   지나가며 인사만 남기고 사라졌군.\n   진짜 구독자가 생길 성싶으냐.",
+                    statusKr: "폭풍 같던 코코를 떠올리며 쓴웃음",
+                    statusJp: "嵐のように去ったココに苦笑い",
+                  },
+                ],
+              },
+              {
+                title: "보라빛 마녀와 49G 점술",
+                steps: [
+                  {
+                    expr: "sketchbook",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ ………….\n＊ 『어둠 속에서 누군가 이쪽을\n   바라보는 기척이 난다』",
+                    statusKr: "문득 스치는 나비 기척을 감지함",
+                    statusJp: "ふと過る蝶の気配を察知中",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "mago",
+                    guestChar: "mago",
+                    guestExpr: "smile",
+                    text: "＊ [마고] 우후후… 안안 쨩이군?\n   나처럼 보라빛을 좋아하는 아이는\n   멀리서도 한눈에 알아본단다♡",
+                    statusKr: "호쇼 마고가 우아하게 미소 지으며 등장!",
+                    statusJp: "宝生マーゴが優雅に微笑んで登場！",
+                  },
+                  {
+                    expr: "shy_hide",
+                    speaker: "anan",
+                    guestChar: "mago",
+                    guestExpr: "normal",
+                    text: "＊ [안안] 마, 마고……!\n   『용건 없다면 혀 날름거리지 말고\n   돌아가 주었으면 한다만』",
+                    statusKr: "마고의 페이스에 살짝 눌리는 중",
+                    statusJp: "マーゴのペースに少し押され気味",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "mago",
+                    guestChar: "mago",
+                    guestExpr: "pensive",
+                    text: "＊ [마고] 어머, 노아 쨩이 그린\n   나비 브로치… 요즘 거리에서도\n   유행하던데 나도 하나 탐나네♡",
+                    statusKr: "마고가 나비 기모노를 쓰다듬으며 미소",
+                    statusJp: "マーゴが蝶の着物を撫でて微笑む",
+                  },
+                  {
+                    expr: "flustered",
+                    speaker: "mago",
+                    guestChar: "mago",
+                    guestExpr: "flushed",
+                    text: "＊ [마고] 기분이 좋아졌으니 특별히\n   안안 쨩의 내일 운세를 점쳐줄게♡\n   물론 복채는 딱 $49지만. 우후후.",
+                    statusKr: "마고가 장난스레 윙크하며 $49 요구!",
+                    statusJp: "マーゴが冗談めかして$49を請求！",
+                  },
+                  {
+                    expr: "angry",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ 『이몸에게 바가지 씌우지 마라!』\n   …그보다 저 녀석, 정말 사람의\n   거짓말을 다 꿰뚫어 보는 걸까.",
+                    statusKr: "마고의 통찰력을 은근히 경계하는 중",
+                    statusJp: "マーゴの洞察力を密かに警戒中",
+                  },
+                ],
+              },
+              {
+                title: "카메라 치워라, 촬영 금지다!",
+                steps: [
+                  {
+                    expr: "sleeve_pout",
+                    speaker: "anan",
+                    guestChar: null,
+                    guest2Char: null,
+                    text: "＊ 이몸의 가게는 조용한 독서와\n   집필을 위한 성역이다.\n   소란스러운 손님은 출입 금지지.",
+                    statusKr: "상점 수칙을 읊으며 정숙을 유지",
+                    statusJp: "店のルールを掲げて静寂を保つ",
+                  },
+                  {
+                    expr: "surprised",
+                    speaker: "coco",
+                    guestChar: "coco",
+                    guestExpr: "smile",
+                    guest2Char: null,
+                    text: "＊ [코코] 에~이 그러지 말고!\n   이 코코땅이 상점 홍보 영상\n   한 방에 따끈하게 찍어줄게~!",
+                    statusKr: "코코가 카메라를 들고 불쑥 끼어듦!",
+                    statusJp: "ココがカメラを構えて割り込み！",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "mago",
+                    guestChar: "coco",
+                    guestExpr: "normal",
+                    guest2Char: "mago",
+                    guest2Expr: "normal",
+                    text: "＊ [마고] 어머, 귀여운 사자후가\n   들리네? 코코 쨩, 또 고장 난\n   카메라로 모두를 귀찮게 하니?",
+                    statusKr: "마고가 구경하듯 3번째로 난입!",
+                    statusJp: "マーゴが面白そうに3人目として登場！",
+                  },
+                  {
+                    expr: "smug",
+                    speaker: "coco",
+                    guestChar: "coco",
+                    guestExpr: "smile",
+                    guest2Char: "mago",
+                    guest2Expr: "surprised",
+                    ananX: -1.52,
+                    guestX: 0.36,
+                    guest2X: 1.48,
+                    text: "＊ [코코] 마고 쨩도 마침 잘 왔다!\n   보라색 자매 투샷 각이잖아~?!\n   자, 여기 렌즈 보고 브이 해줘!",
+                    statusKr: "코코가 마고 쪽으로 바짝 들이댐!",
+                    statusJp: "ココがマーゴにぐいぐい接近！",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "mago",
+                    guestChar: "coco",
+                    guestExpr: "cry",
+                    guest2Char: "mago",
+                    guest2Expr: "pensive",
+                    ananX: -1.48,
+                    guestX: -0.22,
+                    guest2X: 1.56,
+                    text: "＊ [마고] 어머나… 아마추어의 고정\n   카메라잖아? 이런 저화질에 내\n   아름다운 실루엣은 아깝단다♡",
+                    statusKr: "마고가 우아하게 피하며 한 방 먹임!",
+                    statusJp: "マーゴが華麗にかわして切り返す！",
+                  },
+                  {
+                    expr: "angry",
+                    speaker: "anan",
+                    guestChar: "coco",
+                    guestExpr: "fearful",
+                    guest2Char: "mago",
+                    guest2Expr: "smile",
+                    ananX: -1.48,
+                    guestX: -0.02,
+                    guest2X: 1.48,
+                    text: "＊ [안안] 『촬영은 전면 금지다!!』\n   내 가게가 예능 세트장이냐!\n   코코는 카메라부터 집어넣거라!",
+                    statusKr: "안안이 스케치북으로 렌즈를 막음",
+                    statusJp: "アンアンがスケッチブックで阻止中",
+                  },
+                  {
+                    expr: "proud_blush",
+                    speaker: "anan",
+                    guestChar: null,
+                    guest2Char: null,
+                    text: "＊ ……결국 마고한테 혼나고\n   코코가 도망가 버렸군.\n   뭐, 저 둘 케미도 꽤 웃기긴 했지.",
+                    statusKr: "시끌벅적했던 소동 뒤에 피식 웃음",
+                    statusJp: "騒がしい嵐の後で思わず苦笑",
+                  },
+                ],
+              },
+              {
+                title: "▸ 다음 대화 목록 (7/9)",
+                isNextPage: true,
+              },
+            ],
+            [
+              {
+                title: "마스크 뒤의 서툰 상냥함",
+                steps: [
+                  {
+                    expr: "calm",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ ……검은 후드 자락을 펄럭이며\n   문 앞을 서성이는 녀석이 있군.\n   들어올 거면 말하고 들어오거라.",
+                    statusKr: "문틈 너머 검은 후드를 발견함",
+                    statusJp: "扉の外の黒いフードに気づく",
+                  },
+                  {
+                    expr: "surprised",
+                    speaker: "arisa",
+                    guestChar: "arisa",
+                    guestExpr: "angry",
+                    text: "＊ [아리사] 칫… 시토 아리사다.\n   너희들이랑 친한 척 어울릴 생각\n   없어. 그냥 길 잘못 들었을 뿐이야!",
+                    statusKr: "시토 아리사가 까칠하게 경계 중!",
+                    statusJp: "紫藤アリサが警戒しながら登場！",
+                  },
+                  {
+                    expr: "sketchbook",
+                    speaker: "anan",
+                    guestChar: "arisa",
+                    guestExpr: "normal",
+                    text: "＊ [안안] 『불 마법은 가게 금지다』\n   그보다 손에 든 작은 엽서는…\n   그림 보는 걸 좋아하는 거 아니냐?",
+                    statusKr: "안안이 아리사의 시선을 눈치챔",
+                    statusJp: "アンアンがアリサの視線に気づく",
+                  },
+                  {
+                    expr: "smug",
+                    speaker: "arisa",
+                    guestChar: "arisa",
+                    guestExpr: "flushed",
+                    text: "＊ [아리사] 뭐, 뭐라는 거야?!\n   딱히 감상한 게 아니라 그냥\n   선 하나는 깔끔하길래 봤을 뿐…!",
+                    statusKr: "아리사가 마스크 위로 귀까지 새빨개짐",
+                    statusJp: "アリサがマスク越しに真っ赤になる",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "arisa",
+                    guestChar: "arisa",
+                    guestExpr: "pensive",
+                    text: "＊ [아리사] ……난 내 마법이 싫어.\n   자칫하면 다 태워버리니까…\n   너도 네 그림, 함부로 버리지 마.",
+                    statusKr: "아리사가 시선을 내리고 진심을 전함",
+                    statusJp: "アリサが伏し目がちに本音を漏らす",
+                  },
+                  {
+                    expr: "proud_blush",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ 겉으로는 날을 세우고 있어도\n   속은 누구보다 남을 해치기\n   싫어하는 서툰 녀석이군.",
+                    statusKr: "떠난 아리사의 말에 마음을 놓음",
+                    statusJp: "立ち去ったアリサの優しさに微笑む",
+                  },
+                ],
+              },
+              {
+                title: "사라진 머리 리본 미스터리",
+                steps: [
+                  {
+                    expr: "one_sleeve",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ ………….\n＊ 『조용한 저녁에 문밖에서\n   누군가 기웃거리는 기척이군』",
+                    statusKr: "문밖의 기척에 고개를 돌림",
+                    statusJp: "扉の前の気配に気づく",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "nanoka",
+                    guestChar: "nanoka",
+                    guestExpr: "normal",
+                    text: "＊ [나노카] ……안녕, 나츠메 안안.\n   혹시 내 머리 리본 못 봤어?\n   카페 들렀다 깜빡 놓고 온 듯해.",
+                    statusKr: "나노카가 잃어버린 리본을 찾음",
+                    statusJp: "ナノカが失くしたリボンを捜索中",
+                  },
+                  {
+                    expr: "flustered",
+                    speaker: "anan",
+                    guestChar: "nanoka",
+                    guestExpr: "pensive",
+                    text: "＊ [안안] 『모르는 일이다만』\n   설마 이몸이 수집용으로 몰래\n   챙겼다고 의심하는 건 아니겠지?",
+                    statusKr: "안안이 스케치북으로 결백을 알림",
+                    statusJp: "アンアンが筆談で潔白を主張中",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "nanoka",
+                    guestChar: "nanoka",
+                    guestExpr: "angry",
+                    text: "＊ [나노카] 그런 건 아니지만…\n   낮에 같이 장 보러 다닐 때\n   네 옆 탁자에 둔 기억이 나서.",
+                    statusKr: "나노카가 기억을 더듬어 보는 중",
+                    statusJp: "ナノカが記憶を辿っている",
+                  },
+                  {
+                    expr: "surprised",
+                    speaker: "nanoka",
+                    guestChar: "nanoka",
+                    guestExpr: "flushed",
+                    text: "＊ [나노카] ……아, 내 코트 주머니\n   안에 그대로 있었네. 괜한 걸\n   물어봐서 미안, 나츠메 안안.",
+                    statusKr: "주머니에서 리본을 찾고 사과함",
+                    statusJp: "ポケットで見つけて謝罪中",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "nanoka",
+                    guestChar: "nanoka",
+                    guestExpr: "smile",
+                    text: "＊ [나노카] 답례로 커피 사 올게.\n   그리고…… 네 소설, 완성되면\n   제일 먼저 빌려 읽게 해 줘.",
+                    statusKr: "나노카가 옅게 웃으며 약조함",
+                    statusJp: "ナノカが微かに笑って約束を残す",
+                  },
+                  {
+                    expr: "proud_blush",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ ……무뚝뚝하지만 누구보다\n   정직하고 다정한 녀석이군.\n   독자 1호 자리쯤은 내주도록 하지.",
+                    statusKr: "첫 독자 예약에 은근히 뿌듯해함",
+                    statusJp: "第一号読者の予約に満足げ",
+                  },
+                ],
+              },
+              {
+                title: "책방 안에서 불꽃은 금지다!",
+                steps: [
+                  {
+                    expr: "sketchbook",
+                    speaker: "anan",
+                    guestChar: null,
+                    guest2Char: null,
+                    text: "＊ 밤공기가 꽤 쌀쌀해졌군.\n   『하지만 원고가 쌓인 가게 안에선\n   작은 불씨라도 엄격히 금지다』",
+                    statusKr: "스케치북에 화기 엄금 팻말을 씀",
+                    statusJp: "スケッチブックに火気厳禁と書く",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "nanoka",
+                    guestChar: "nanoka",
+                    guestExpr: "normal",
+                    guest2Char: null,
+                    text: "＊ [나노카] 불조심은 동의해.\n   방금 문밖 골목에서 매캐한 연기\n   냄새가 났거든. 무슨 일 있어?",
+                    statusKr: "나노카가 냄새를 쫓아 상점에 들어옴",
+                    statusJp: "ナノカが異変を追って入室した",
+                  },
+                  {
+                    expr: "angry",
+                    speaker: "arisa",
+                    guestChar: "nanoka",
+                    guestExpr: "pensive",
+                    guest2Char: "arisa",
+                    guest2Expr: "angry",
+                    text: "＊ [아리사] 하아?! 누가 불장난을\n   했단 거야! 꼬치 굽다 좀 태운 거\n   가지고 뭘 그렇게 쫓아와!!",
+                    statusKr: "아리사가 발끈하며 3번째로 난입!",
+                    statusJp: "アリサが苛立ちながら乱入！",
+                  },
+                  {
+                    expr: "flustered",
+                    speaker: "nanoka",
+                    guestChar: "nanoka",
+                    guestExpr: "surprised",
+                    guest2Char: "arisa",
+                    guest2Expr: "surprised",
+                    ananX: -1.50,
+                    guestX: 0.36,
+                    guest2X: 1.48,
+                    text: "＊ [나노카] 그래도 종이 많잖아,\n   시토 아리사. 소매에 불꽃도 튀어\n   보여서… 일단 꼬치 내려놔.",
+                    statusKr: "나노카가 제지하려 아리사 쪽으로 이동",
+                    statusJp: "ナノカが制止しようと一歩踏み出す",
+                  },
+                  {
+                    expr: "surprised",
+                    speaker: "arisa",
+                    guestChar: "nanoka",
+                    guestExpr: "normal",
+                    guest2Char: "arisa",
+                    guest2Expr: "flushed",
+                    ananX: -1.48,
+                    guestX: -0.18,
+                    guest2X: 1.62,
+                    text: "＊ [아리사] 우, 웃기지 마! 네가\n   매번 잔소리꾼처럼 굴 일인가?!\n   불 다 껐으니까 가까이 오지 마!",
+                    statusKr: "아리사가 당황하며 오른쪽으로 물러남",
+                    statusJp: "アリサが照れ隠しに右へ飛び退く",
+                  },
+                  {
+                    expr: "angry",
+                    speaker: "anan",
+                    guestChar: "nanoka",
+                    guestExpr: "pensive",
+                    guest2Char: "arisa",
+                    guest2Expr: "pensive",
+                    ananX: -1.48,
+                    guestX: -0.02,
+                    guest2X: 1.48,
+                    text: "＊ [안안] 『전부 압수해 버린다!』\n   탄 냄새도 스파크도 전부 금지다!\n   이몸 원고에 그을음 남으면 각오해!",
+                    statusKr: "원고를 사수하며 둘을 동시 진압!",
+                    statusJp: "原稿を守るため二人を一喝！",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "anan",
+                    guestChar: null,
+                    guest2Char: null,
+                    text: "＊ ……결국 둘 다 입을 꾹 다물고\n   순순히 물러났다. 말투는 거칠어도\n   서로 가게 걱정은 해 주는군.",
+                    statusKr: "평온을 되찾은 상점을 정리 중",
+                    statusJp: "平穏を取り戻しほっと一息つく",
+                  },
+                ],
+              },
+              {
+                title: "▸ 다음 대화 목록 (8/9)",
+                isNextPage: true,
+              },
+            ],
+            [
+              {
+                title: "한밤중 호러 각본 낭독회",
+                steps: [
+                  {
+                    expr: "smug",
+                    speaker: "anan",
+                    guestChar: null,
+                    guest2Char: null,
+                    text: "＊ 좋아… 오늘은 공포 신작의\n   클라이맥스를 소리 내어 다듬자!\n   「칠흑의 복도 끝에서 붉은 손이…」",
+                    statusKr: "자신만만하게 공포 소설을 낭독 중",
+                    statusJp: "自信満々にホラー小説を朗読中",
+                  },
+                  {
+                    expr: "surprised",
+                    speaker: "coco",
+                    guestChar: "coco",
+                    guestExpr: "fearful",
+                    guest2Char: null,
+                    text: "＊ [코코] 히이익!? 뭐, 뭐야 갑자기\n   저주 인형 같은 무서운 대사는!!\n   아틔시 호러 무리라고오오!!",
+                    statusKr: "코코가 비명을 지르며 놀라서 난입!",
+                    statusJp: "ココが悲鳴を上げて飛び込んでくる！",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "hiro",
+                    guestChar: "coco",
+                    guestExpr: "cry",
+                    guest2Char: "hiro",
+                    guest2Expr: "arms_normal",
+                    ananX: -1.52,
+                    guestX: 0.36,
+                    guest2X: 1.48,
+                    text: "＊ [히로] 시끄럽다, 사와타리 코코.\n   비명이 가게 밖까지 다 들리더군.\n   네가 지금 뭘 읽고 있었던 거지?",
+                    statusKr: "근처 지나던 히로가 소란에 등장!",
+                    statusJp: "通り掛かりのヒロが騒ぎで登場！",
+                  },
+                  {
+                    expr: "flustered",
+                    speaker: "coco",
+                    guestChar: "coco",
+                    guestExpr: "cry",
+                    guest2Char: "hiro",
+                    guest2Expr: "arms_surprised",
+                    ananX: -1.48,
+                    guestX: 0.72,
+                    guest2X: 1.48,
+                    text: "＊ [코코] 흐엉 히로 쨩 살려줘~!\n   안안 쨩이 귀신 소설을 읽어서\n   밤에 화장실 못 가겠단 말야!",
+                    statusKr: "코코가 히로 곁으로 후다닥 숨음!",
+                    statusJp: "ココがヒロの影へ慌てて逃げ込む！",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "hiro",
+                    guestChar: "coco",
+                    guestExpr: "pensive",
+                    guest2Char: "hiro",
+                    guest2Expr: "pensive",
+                    ananX: -1.48,
+                    guestX: -0.02,
+                    guest2X: 1.48,
+                    text: "＊ [히로] 진정해라. 원고는… 음.\n   안안, 지난번보다 공포 묘사의\n   완급이 훨씬 날카로워졌군.",
+                    statusKr: "히로가 뜻밖에 진지한 평론을 남김",
+                    statusJp: "ヒロが意外にも真剣な批評をする",
+                  },
+                  {
+                    expr: "proud_blush",
+                    speaker: "anan",
+                    guestChar: null,
+                    guest2Char: null,
+                    text: "＊ 흥! 독자의 비명을 끌어냈으니\n   호러 각본가로선 대성공이다!\n   히로의 평가도 나쁘지 않았고 말야.",
+                    statusKr: "작가로서 뿌듯하게 펜을 세움",
+                    statusJp: "ホラー作家として満足げな様子",
+                  },
+                ],
+              },
+              {
+                title: "여분 붕대와 이상한 다정함",
+                steps: [
+                  {
+                    expr: "worried",
+                    speaker: "anan",
+                    guestChar: null,
+                    guest2Char: null,
+                    text: "＊ 그러고 보니… 다들 저마다\n   남모를 고집이나 서툰 면을\n   하나씩은 품고 살아가는 듯하군.",
+                    statusKr: "친구들의 서툰 다정함을 떠올림",
+                    statusJp: "少女たちの優しさを静かに想う",
+                  },
+                  {
+                    expr: "angry",
+                    speaker: "arisa",
+                    guestChar: "arisa",
+                    guestExpr: "pensive",
+                    guest2Char: null,
+                    text: "＊ [아리사] 저기… 여기 $49짜리\n   붕대 같은 건 안 파냐? 그냥…\n   모기 물린 데 붙일 게 필요해서.",
+                    statusKr: "아리사가 시선을 돌리며 붕대를 찾음",
+                    statusJp: "アリサが視線を逸らして包帯を探す",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "nanoka",
+                    guestChar: "arisa",
+                    guestExpr: "surprised",
+                    guest2Char: "nanoka",
+                    guest2Expr: "normal",
+                    ananX: -1.50,
+                    guestX: -0.02,
+                    guest2X: 1.12,
+                    text: "＊ [나노카] 모기… 손목에 긁힌 자국\n   다 보였는데. 자, 내 팔 감고 남은\n   여분 붕대 줄게. 깨끗한 거야.",
+                    statusKr: "나노카가 다가와 여분 붕대를 건넴",
+                    statusJp: "ナノカが近づき予備の包帯を差し出す",
+                  },
+                  {
+                    expr: "flustered",
+                    speaker: "arisa",
+                    guestChar: "arisa",
+                    guestExpr: "flushed",
+                    guest2Char: "nanoka",
+                    guest2Expr: "smile",
+                    ananX: -1.54,
+                    guestX: -0.34,
+                    guest2X: 1.46,
+                    text: "＊ [아리사] 으윽…! 누가 달랬냐?!\n   마음대로 던져주고… 흥, 그래도\n   감기는 편하네… 고, 고맙다.",
+                    statusKr: "아리사가 살짝 비키며 수줍게 받음",
+                    statusJp: "アリサが照れつつ少し身を引く",
+                  },
+                  {
+                    expr: "sketchbook",
+                    speaker: "anan",
+                    guestChar: "arisa",
+                    guestExpr: "flushed",
+                    guest2Char: "nanoka",
+                    guest2Expr: "smile",
+                    ananX: -1.48,
+                    guestX: -0.02,
+                    guest2X: 1.48,
+                    text: "＊ [안안] 『고마우면 솔직히 말해도\n   된다』 이몸의 상점엔 돈으로\n   살 수 없는 훈훈함도 있는 법이지.",
+                    statusKr: "스케치북에 훈훈한 일침을 남김",
+                    statusJp: "スケッチブックで微笑ましいツッコミ",
+                  },
+                  {
+                    expr: "proud_blush",
+                    speaker: "anan",
+                    guestChar: null,
+                    guest2Char: null,
+                    text: "＊ ……이렇게 투닥거리면서도\n   오늘 밤 거리를 함께 걸을 수\n   있는 친구들이 있어 다행이군.",
+                    statusKr: "함께 있는 친구들을 흐뭇하게 봄",
+                    statusJp: "今を共にする仲間に微笑む",
                   },
                 ],
               },
@@ -2093,8 +2826,8 @@
             {
               expr: "sketchbook",
               text: "＊ 『이몸에게 신경 쓰지 마라.\n   말 걸지 마라』",
-              statusKr: "독방의 고독 속으로 돌아가는 중",
-              statusJp: "独房の静寂へ戻ろうとしている",
+              statusKr: "자신만의 고독 속으로 돌아가는 중",
+              statusJp: "自室の静寂へ戻ろうとしている",
             },
             {
               expr: "nervous_hide",
@@ -2192,19 +2925,19 @@
               bought: false,
             },
             {
-              name: "アリバイ整理メモ",
+              name: "集まりの予定メモ帳",
               price: 14,
-              desc: "＊ 全員の証言と行動を\n   まとめた記録帳。\n   推理の要である。",
+              desc: "＊ 茶会と休日の予定を\n   まとめた記録帳。\n   予定管理の要だ。",
               steps: [
                 {
                   expr: "sketchbook",
-                  text: "＊ 『みなのアリバイはわがはいが\n   まとめておいた。気になった時は\n   これを見るがいい』",
-                  statusKr: "알리바이 기록을 제시하는 중",
-                  statusJp: "アリバイ記録を提示中",
+                  text: "＊ 『みな予定が合わぬゆえ、\n   茶会の日程をまとめておいた。\n   これを見て忘れるな』",
+                  statusKr: "모임 일정 수첩을 펼쳐 보임",
+                  statusJp: "集まりの予定帳を見せている",
                 },
                 {
                   expr: "wide_eyes",
-                  text: "＊ 『当てずっぽうで言う前に、\n   頭を働かせろ。\n   脳みそ入ってないのか？』",
+                  text: "＊ 『当てずっぽうで聞く前に、\n   まず予定表を確認しろ。\n   カレンダーは飾りか？』",
                   statusKr: "눈을 크게 뜨고 일침을 가하는 중",
                   statusJp: "目を見開いて一喝している",
                 },
@@ -2242,15 +2975,15 @@
                 steps: [
                   {
                     expr: "sketchbook",
-                    text: "＊ 『わがはいの魔法は、相手を\n   納得させられたら命令に\n   従わせることができるものだ』",
+                    text: "＊ 『相手を納得させられれば\n   頼みを聞かせられる力…\n   いわば軽度の【洗脳】である』",
                     statusKr: "【세뇌】 마법을 설명하는 중",
                     statusJp: "【洗脳】の魔法を説明中",
                   },
                   {
                     expr: "one_sleeve",
-                    text: "＊ 『いわば、軽度の【洗脳】。望まぬ\n   死を与えられるようなものではない。\n   あらぬ疑いをかけるのはやめろ』",
-                    statusKr: "한쪽 소매로 가리며 반박하는 중",
-                    statusJp: "片袖で口元を隠して反論中",
+                    text: "＊ 『最近は夜更かしばかりする\n   連中を早く寝かせるのに\n   使っておるくらいだぞ』",
+                    statusKr: "한쪽 소매로 가리며 해명하는 중",
+                    statusJp: "片袖で口元を隠して説明中",
                   },
                 ],
               },
@@ -2272,7 +3005,7 @@
                 ],
               },
               {
-                title: "▸ 次の話題へ (1/5)",
+                title: "▸ 次の話題へ (1/9)",
                 isNextPage: true,
               },
             ],
@@ -2311,7 +3044,7 @@
                     speaker: "noah",
                     guestChar: "noah",
                     guestExpr: "angry",
-                    text: "＊ [ノア] むー！ 怖くないように\n   お守り描いてあげたのにぃ！\n   お絵描きしないと生きられないもん！",
+                    text: "＊ [ノア] むー！ 悪い夢を見ないよう\n   お守り描いてあげたのにぃ！\n   お絵描きしないと生きられないもん！",
                     statusKr: "노아가 볼을 부풀리며 토라지는 중",
                     statusJp: "ノアがむーっと頬を膨らませている",
                   },
@@ -2354,43 +3087,43 @@
                   },
                   {
                     expr: "worried",
-                    text: "＊ ……ちがう。告白する。\n   うまく書けなくて、察したヒロが\n   図書室で作業を手伝ってくれて…",
+                    text: "＊ ……ちがう。告白する。\n   うまく書けなくて、察したヒロが\n   図書館で作業を手伝ってくれて…",
                     statusKr: "히로가 도와줬다고 실토하는 중",
                     statusJp: "ヒロに手伝ってもらったと告白中",
                   },
                 ],
               },
               {
-                title: "牢屋敷での暮らし",
+                title: "静かな隠れ家の一日",
                 steps: [
                   {
                     expr: "sleepy",
                     speaker: "anan",
                     guestChar: null,
-                    text: "＊ わがはいが真に欲するは\n   深遠なる孤独と静寂……！\n   ここで暮らす方が楽かもしれない。",
-                    statusKr: "심원한 고독과 정적을 갈망 중",
-                    statusJp: "深遠なる孤独と静寂を求めている",
+                    text: "＊ わがはいが真に欲するは、\n   静かに原稿を書ける部屋と\n   温かいお茶の一杯だけだ……!",
+                    statusKr: "조용한 일상과 휴식을 즐기는 중",
+                    statusJp: "静かな日常を満喫している",
                   },
                   {
                     expr: "calm",
                     speaker: "anan",
                     guestChar: null,
-                    text: "＊ ご飯も意外と口に合うし、\n   静かに脚本の構想を練るには\n   悪くない環境である。",
-                    statusKr: "감옥 저택의 일상을 회상 중",
-                    statusJp: "牢屋敷での日々を回想中",
+                    text: "＊ 昔は独りが一番気楽だと\n   思っていたが、今は皆がこうして\n   ふらりと遊びに来るのだからな。",
+                    statusKr: "바뀐 일상을 가만히 떠올림",
+                    statusJp: "変わった日常を思い返している",
                   },
                   {
                     expr: "proud_blush",
                     speaker: "anan",
                     guestChar: null,
-                    text: "＊ でもここで、初めて誰かが\n   そばにいてくれた。話さなくても、\n   友だちになってくれた……！",
-                    statusKr: "감옥에서 만난 친구들을 떠올림",
-                    statusJp: "牢屋敷の友だちを思い出している",
+                    text: "＊ 言葉を交わさずとも気にかけて\n   くれる友だちができた今の暮らし\n   も……悪くはないと思っているぞ!",
+                    statusKr: "소중한 친구들과의 현재를 미소 지음",
+                    statusJp: "大切な友達との今に微笑む",
                   },
                 ],
               },
               {
-                title: "▸ 次の話題へ (2/5)",
+                title: "▸ 次の話題へ (2/9)",
                 isNextPage: true,
               },
             ],
@@ -2402,9 +3135,9 @@
                     expr: "worried",
                     speaker: "anan",
                     guestChar: null,
-                    text: "＊ 脚本……ミリアと少しだけ書いた。\n   あいつは映画が好きだった……\n   いつもわがはいと見てくれたのだ。",
-                    statusKr: "미리아와 영화 보던 날을 회상 중",
-                    statusJp: "ミリアと映画を見た日々を回想中",
+                    text: "＊ 最近、ミリアと映画を観るのが\n   日課になっていてな。あの作品群\n   は意外に脚本の参考にもなるのだ。",
+                    statusKr: "미리아와 볼 영화를 고르는 중",
+                    statusJp: "ミリアと見る映画を選んでいる",
                   },
                   {
                     expr: "wide_eyes",
@@ -2455,9 +3188,9 @@
                     expr: "proud_blush",
                     speaker: "anan",
                     guestChar: null,
-                    text: "＊ ふん……臆病者め。\n   ノアやレイア、ミリアといる\n   時間が、とても好きだった。",
-                    statusKr: "소중한 친구들과의 시간을 그리워함",
-                    statusJp: "みんなといる時間が好きだった",
+                    text: "＊ ふん……臆病者め。\n   だがノアやレイア、ミリア達と\n   集まる休日はいつも楽しみなのだ。",
+                    statusKr: "친구들과 놀 주말을 기대하는 중",
+                    statusJp: "みんなと遊ぶ休日を楽しみに中",
                   },
                 ],
               },
@@ -2536,7 +3269,7 @@
                 ],
               },
               {
-                title: "▸ 次の話題へ (3/5)",
+                title: "▸ 次の話題へ (3/9)",
                 isNextPage: true,
               },
             ],
@@ -2559,15 +3292,15 @@
                 ],
               },
               {
-                title: "魔女裁判と推理",
+                title: "消えたプリンと名探偵",
                 steps: [
                   {
                     expr: "one_sleeve",
                     speaker: "anan",
                     guestChar: null,
-                    text: "＊ ……誰が犯人でもいい。\n   だが、濡れ衣はご免である。\n   アリバイはもうまとめておいた。",
-                    statusKr: "한쪽 소매로 입을 가리고 경계 중",
-                    statusJp: "片袖で口元を隠して警戒中",
+                    text: "＊ ……誰だ、冷蔵庫に入れた\n   わがはいの特製プリンを勝手に\n   食べた大胆不敵な輩は。",
+                    statusKr: "사라진 푸딩 때문에 예민해짐",
+                    statusJp: "消えたプリンに厳戒態勢中",
                   },
                   {
                     expr: "surprised",
@@ -2583,7 +3316,7 @@
                     speaker: "sherry",
                     guestChar: "sherry",
                     guestExpr: "pensive",
-                    text: "＊ [シェリー] うーん…アンアンさん、\n   隠しおやつトリックでも仕込んで\n   たりしませんか～？ 名探偵の勘！",
+                    text: "＊ [シェリー] うーん…アンアンさん\n   ご自分で食べて忘れたなんて\n   トリックはありませんか～？",
                     statusKr: "셰리가 진지하게 턱을 괴고 추리 중",
                     statusJp: "シェリーが顎に手を当て推理中",
                   },
@@ -2592,7 +3325,7 @@
                     speaker: "anan",
                     guestChar: "sherry",
                     guestExpr: "explain",
-                    text: "＊ [アンアン] 珍推理をするなっ！\n   『犯人はわがはいの【洗脳】で\n   自白させるから無用である！』",
+                    text: "＊ [アンアン] 珍推理をするなっ！\n   『どうせ犯人はわがはいの特製\n   柚子茶ですぐ吐かせてみせる!』",
                     statusKr: "셰리의 엉뚱한 추리에 반박 중",
                     statusJp: "シェリーの珍推理にツッコミ中",
                   },
@@ -2601,30 +3334,30 @@
                     speaker: "sherry",
                     guestChar: "sherry",
                     guestExpr: "smile",
-                    text: "＊ [シェリー] えへへ、でもほんとは\n   アンアンさんのアリバイは完璧！\n   名探偵が保証しまーす！",
-                    statusKr: "셰리가 환하게 엄지를 척 세워 보임",
-                    statusJp: "シェリーが満面の笑みで太鼓判！",
+                    text: "＊ [シェリー] えへへ、冗談ですよ！\n   さっきマーゴさんがお盆に載せて\n   ました！名探偵の目撃証言です!",
+                    statusKr: "셰리가 웃으며 목격담을 제보함",
+                    statusJp: "シェリーが笑いながら証言中",
                   },
                   {
                     expr: "worried",
                     speaker: "anan",
                     guestChar: null,
-                    text: "＊ 騒がしい探偵め……。\n   だが、わがはいだって、みんなで\n   無事にここを出たいのだ……。",
-                    statusKr: "수심 어린 눈으로 동료를 걱정 중",
-                    statusJp: "憂いを帯びた目で仲間を案じる",
+                    text: "＊ 騒がしい探偵ごっこめ……。\n   だが、こんなくだらぬ日常を\n   笑い合える今が愛おしいな……。",
+                    statusKr: "소소한 일상에 살짝 미소 지음",
+                    statusJp: "何気ない日常に目を細める",
                   },
                 ],
               },
               {
-                title: "独房の微睡みと妄想",
+                title: "自室の空想世界",
                 steps: [
                   {
                     expr: "sleepy",
                     speaker: "anan",
                     guestChar: null,
-                    text: "＊ その気になれば、独房でずっと\n   物語の世界を妄想し、その微睡みの\n   中で過ごすことができる。",
-                    statusKr: "독방의 망상 세계를 이야기하는 중",
-                    statusJp: "独房の微睡みを語っている",
+                    text: "＊ その気になれば、自室の隅で\n   一晩中物語の世界を思い描き、\n   その微睡みの中で過ごせるのだ。",
+                    statusKr: "방구석 공상 세계를 이야기 중",
+                    statusJp: "自室の微睡みを語っている",
                   },
                   {
                     expr: "calm",
@@ -2637,7 +3370,7 @@
                 ],
               },
               {
-                title: "▸ 次の話題へ (4/5)",
+                title: "▸ 次の話題へ (4/9)",
                 isNextPage: true,
               },
             ],
@@ -2744,7 +3477,7 @@
                     speaker: "anan",
                     guestChar: "sherry",
                     guestExpr: "surprised",
-                    text: "＊ [アンアン] 『却下だ！！』\n   独房が崩れるだろうが！\n   ハンナの時の二の舞にする気か！",
+                    text: "＊ [アンアン] 『却下だ！！』\n   店の壁が崩れるだろうが！\n   ハンナの時の二の舞にする気か！",
                     statusKr: "셰리의 괴력을 필사적으로 제지 중",
                     statusJp: "シェリーの怪力を全力で阻止中",
                   },
@@ -2777,7 +3510,7 @@
                 ],
               },
               {
-                title: "三人寄れば独房は狭い",
+                title: "三人寄れば店は狭い",
                 steps: [
                   {
                     expr: "sleepy",
@@ -2786,7 +3519,7 @@
                     guest2Char: null,
                     text: "＊ 皆が寝静まった深夜……。\n   この静寂こそ、大文豪の天啓を\n   研ぎ澄ます至高の時間である。",
                     statusKr: "조용히 야심한 밤을 음미 중",
-                    statusJp: "静かな深夜の独房を満喫中",
+                    statusJp: "静かな深夜の時間を満喫中",
                   },
                   {
                     expr: "wide_eyes",
@@ -2861,7 +3594,7 @@
                     ananX: -1.48,
                     guestX: -0.02,
                     guest2X: 1.48,
-                    text: "＊ [アンアン] 『騒がしいぞ！』\n   扇子と虫眼鏡をしまわんか！\n   独房が狭いのだ、落ち着けっ。",
+                    text: "＊ [アンアン] 『騒がしいぞ！』\n   扇子と虫眼鏡をしまわんか！\n   部屋が狭いのだ、落ち着けっ。",
                     statusKr: "안안이 둘을 동시에 진정시키는 중",
                     statusJp: "アンアンが2人を一喝している",
                   },
@@ -2884,6 +3617,787 @@
                     text: "＊ ……騒がしい二人め。\n   だがお陰で今夜も退屈せずに\n   済みそうだ……悪くはないな。",
                     statusKr: "조용히 미소 지으며 밤을 지새움",
                     statusJp: "密かに微笑んで見送っている",
+                  },
+                ],
+              },
+              {
+                title: "▸ 次の話題へ (5/9)",
+                isNextPage: true,
+              },
+            ],
+            [
+              {
+                title: "エマと週末カフェ巡り",
+                steps: [
+                  {
+                    expr: "calm",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ ……誰だ？店の扉の外で\n   紙袋を大事そうに抱えて\n   そわそわしている影があるな。",
+                    statusKr: "문밖의 기척에 고개를 듦",
+                    statusJp: "扉の前の気配に顔を上げる",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "ema",
+                    guestChar: "ema",
+                    guestExpr: "smile",
+                    text: "＊ [エマ] アンアンちゃん元気！？\n   駅前の和菓子屋で桜餅を見つけ\n   思わず買ってきちゃったよ！",
+                    statusKr: "에마가 간식 봉투를 들고 활짝 웃음!",
+                    statusJp: "エマがお土産を手に笑顔で登場！",
+                  },
+                  {
+                    expr: "flustered",
+                    speaker: "anan",
+                    guestChar: "ema",
+                    guestExpr: "normal",
+                    text: "＊ [アンアン] 桜羽……エマ？\n   『原稿の締め切り直前に甘い誘惑\n   を持ち込むとは何事かね』",
+                    statusKr: "디저트 유혹에 살짝 흔들리는 중",
+                    statusJp: "甘い誘惑に少し揺れている",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "ema",
+                    guestChar: "ema",
+                    guestExpr: "surprised",
+                    text: "＊ [エマ] ええっ、また徹夜したの？\n   ダメだよぉ！たまにはお散歩して\n   ちゃんと休憩もしなきゃ！",
+                    statusKr: "에마가 밤샘 작업을 걱정하며 챙김",
+                    statusJp: "エマが徹夜続きを心配している",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "ema",
+                    guestChar: "ema",
+                    guestExpr: "determined",
+                    text: "＊ [エマ] 次の日曜、みんなで川沿い\n   の公園にピクニック行くんだ！\n   アンアンちゃんの分も作るね！",
+                    statusKr: "에마가 주말 소풍 계획을 신나게 말함!",
+                    statusJp: "エマが休日のピクニックを約束中！",
+                  },
+                  {
+                    expr: "proud_blush",
+                    speaker: "ema",
+                    guestChar: "ema",
+                    guestExpr: "flushed",
+                    text: "＊ [エマ] えへへ…じゃあ原稿が\n   終わったら連絡してね！新作の\n   お菓子持ってまた来るよ〜！",
+                    statusKr: "에마가 수줍게 웃으며 인사를 건넴",
+                    statusJp: "エマが照れ笑いしながら手を振る",
+                  },
+                  {
+                    expr: "proud_blush",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ ……眩しいほど元気な奴だ。\n   だが、締め切り後に食べる桜餅は\n   確かに格別の味だろうな。",
+                    statusKr: "에마가 준 간식을 보며 미소 지음",
+                    statusJp: "差し入れを見て微笑んでいる",
+                  },
+                ],
+              },
+              {
+                title: "図書館の借りと赤い百合",
+                steps: [
+                  {
+                    expr: "worried",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ …………。\n＊ 『先日、図書館で止まった原稿…\n   次の展開がまだ繋がらぬ』",
+                    statusKr: "도서관에서 쓰던 원고를 고민 중",
+                    statusJp: "図書館の原稿を思い返している",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "hiro",
+                    guestChar: "hiro",
+                    guestExpr: "arms_normal",
+                    text: "＊ [ヒロ] 夏目アンアンか。\n   こんな遅くに看板の灯りも消して\n   何をしているんだ、君は。",
+                    statusKr: "니카이도 히로가 팔짱 끼고 등장!",
+                    statusJp: "二階堂ヒロが腕を組んで登場！",
+                  },
+                  {
+                    expr: "flustered",
+                    speaker: "anan",
+                    guestChar: "hiro",
+                    guestExpr: "arms_pensive",
+                    text: "＊ [アンアン] ヒロか、丁度よい。\n   『先日の小説を手伝った礼に\n   少し話し相手になれ』",
+                    statusKr: "안안이 스케치북을 들어 항변 중",
+                    statusJp: "アンアンがスケッチブックで応戦中",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "hiro",
+                    guestChar: "hiro",
+                    guestExpr: "pensive",
+                    text: "＊ [ヒロ] 礼だと？だが君の文章\n   は癖が強いが芯が通っている。\n   上辺だけの小説ではないな。",
+                    statusKr: "히로가 진지하게 감상을 전함",
+                    statusJp: "ヒロが真剣に感想を伝えている",
+                  },
+                  {
+                    expr: "shy_hide",
+                    speaker: "hiro",
+                    guestChar: "hiro",
+                    guestExpr: "flushed",
+                    text: "＊ [ヒロ] ……夜更かしし過ぎて\n   体調を崩すなよ。ここは静かで\n   頭を冷やすのには悪くない場所だ。",
+                    statusKr: "히로가 시선을 피하며 살짝 붉어짐",
+                    statusJp: "ヒロが視線を逸らして少し照れる",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "hiro",
+                    guestChar: "hiro",
+                    guestExpr: "arms_smile",
+                    text: "＊ [ヒロ] 今度は赤い百合の紅茶でも\n   淹れてくれ。では精を出せよ、\n   未来の大文豪殿。",
+                    statusKr: "히로가 옅은 미소와 함께 뒤돌아섬",
+                    statusJp: "ヒロが微かな笑みを浮かべて去る",
+                  },
+                  {
+                    expr: "proud_blush",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ ……未来の大文豪殿、か。\n   厳しい仮面の裏に、あれほど\n   義理堅い心を持っていたとはな。",
+                    statusKr: "히로의 말에 은근히 기뻐하는 중",
+                    statusJp: "ヒロの言葉に密かに喜んでいる",
+                  },
+                ],
+              },
+              {
+                title: "魔女たちの秘密の茶会",
+                steps: [
+                  {
+                    expr: "calm",
+                    speaker: "anan",
+                    guestChar: null,
+                    guest2Char: null,
+                    text: "＊ たまにはインクの匂いではなく\n   温かい茶葉の香りに包まれて夜を\n   締め括るのも悪くはあるまい。",
+                    statusKr: "따뜻한 차향을 즐기며 숨을 돌림",
+                    statusJp: "温かいお茶の香りで一息ついている",
+                  },
+                  {
+                    expr: "proud_blush",
+                    speaker: "ema",
+                    guestChar: "ema",
+                    guestExpr: "smile",
+                    guest2Char: null,
+                    text: "＊ [エマ] アンアンちゃん！厨房で焼い\n   たビスケット持ってきたよっ！皆で\n   食べればきっと元気が湧くはずだよ！",
+                    statusKr: "에마가 비스킷을 들고 환히 웃음!",
+                    statusJp: "エマが焼きたてのお菓子を持って来た！",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "mago",
+                    guestChar: "ema",
+                    guestExpr: "smile",
+                    guest2Char: "mago",
+                    guest2Expr: "smile",
+                    text: "＊ [マーゴ] ウフフ、良い匂いに誘われ\n   て来ちゃったわ♡さあ紅茶は私が\n   極上の温度で淹れてあげるわね。",
+                    statusKr: "마고까지 합류해 다과회가 열림!",
+                    statusJp: "マーゴも合流しお茶会が開かれる！",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "ema",
+                    guestChar: "ema",
+                    guestExpr: "flushed",
+                    guest2Char: "mago",
+                    guest2Expr: "normal",
+                    text: "＊ [エマ] こうして三人で囲んでると\n   お家のリビングみたいに落ち着いて\n   すごく温かい気持ちになるね…！",
+                    statusKr: "에마가 포근한 분위기에 미소 지음",
+                    statusJp: "エマが和やかな空気に笑顔を浮かべる",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "mago",
+                    guestChar: "ema",
+                    guestExpr: "smile",
+                    guest2Char: "mago",
+                    guest2Expr: "flushed",
+                    text: "＊ [マーゴ] 今夜は特別に無料サービス\n   よ。みんなの明日が「大吉」である\n   ように♡おやすみ、愛しい子たち。",
+                    statusKr: "마고가 상냥한 미소로 축복을 남김",
+                    statusJp: "マーゴが優しい微笑みで祝福する",
+                  },
+                  {
+                    expr: "proud_blush",
+                    speaker: "anan",
+                    guestChar: null,
+                    guest2Char: null,
+                    text: "＊ ……感謝するぞ、全員に。\n   『そなたが訪ねてくれたお陰で、\n   今宵の店番も寂しくはなかったぞ』",
+                    statusKr: "모두를 배웅하며 진심을 고백함",
+                    statusJp: "皆を見送り素直な気持ちを綴る",
+                  },
+                ],
+              },
+              {
+                title: "▸ 次の話題へ (6/9)",
+                isNextPage: true,
+              },
+            ],
+            [
+              {
+                title: "ココたん店舗突撃ロケ！？",
+                steps: [
+                  {
+                    expr: "calm",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ ……何やら扉の外から騒々しい\n   電子音と早口の喋り声が響いて\n   くるのだが……。",
+                    statusKr: "수상한 소란에 귀를 쫑긋 세움",
+                    statusJp: "外からの騒がしい声に警戒中",
+                  },
+                  {
+                    expr: "surprised",
+                    speaker: "coco",
+                    guestChar: "coco",
+                    guestExpr: "smile",
+                    text: "＊ [ココ] おはよー！ココたんだよ！\n   今日は我らが伝説の文豪(!)\n   アンアンちゃんのお店に突撃だ!",
+                    statusKr: "코코가 브이 포즈로 돌발 생방 개시!",
+                    statusJp: "ココがVサインで生配信を突撃開始！",
+                  },
+                  {
+                    expr: "angry",
+                    speaker: "anan",
+                    guestChar: "coco",
+                    guestExpr: "normal",
+                    text: "＊ [アンアン] 『撮影か？出て行け！』\n   客の顔まで勝手に映す気か。\n   無断撮影は厳禁であるぞ！",
+                    statusKr: "안안이 황당해하며 호통치는 중",
+                    statusJp: "アンアンが呆れて追い返そうと中",
+                  },
+                  {
+                    expr: "flustered",
+                    speaker: "coco",
+                    guestChar: "coco",
+                    guestExpr: "pensive",
+                    text: "＊ [ココ] そ、そんなの分かってるし！\n   でもこうして撮影してると落ち着く\n   んだよぉ…チャンネル登録してね？",
+                    statusKr: "코코가 입술을 삐죽이며 투덜거림",
+                    statusJp: "ココが拗ねながらカメラをいじる",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "coco",
+                    guestChar: "coco",
+                    guestExpr: "surprised",
+                    text: "＊ [ココ] えっ！？あの$49のグッズ\n   超バズりそう！あてぃしの人形と\n   コラボしたら神回確定じゃーん！",
+                    statusKr: "코코가 상점 진열품에 눈을 반짝임",
+                    statusJp: "ココが店の品物に目を輝かせる！",
+                  },
+                  {
+                    expr: "smug",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ ……やれやれ、五分も経たぬ内に\n   嵐のように去っていったわ。\n   本当に登録者など増えるのかね。",
+                    statusKr: "폭풍 같던 코코를 떠올리며 쓴웃음",
+                    statusJp: "嵐のように去ったココに苦笑い",
+                  },
+                ],
+              },
+              {
+                title: "蝶の魔女の怪しい占い",
+                steps: [
+                  {
+                    expr: "sketchbook",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ …………。\n＊ 『暗がりから誰かがこちらを\n   値踏みするように見ているな』",
+                    statusKr: "문득 스치는 나비 기척을 감지함",
+                    statusJp: "ふと過る蝶の気配を察知中",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "mago",
+                    guestChar: "mago",
+                    guestExpr: "smile",
+                    text: "＊ [マーゴ] ウフフ…アンアン？\n   私と同じ紫を好む可愛い子は、\n   すぐに見つけられるわよ♡",
+                    statusKr: "호쇼 마고가 우아하게 미소 지으며 등장!",
+                    statusJp: "宝生マーゴが優雅に微笑んで登場！",
+                  },
+                  {
+                    expr: "shy_hide",
+                    speaker: "anan",
+                    guestChar: "mago",
+                    guestExpr: "normal",
+                    text: "＊ [アンアン] マ、マーゴ……！\n   『用がないなら舌なめずりせず\n   早々に引き揚げていただきたい』",
+                    statusKr: "마고의 페이스에 살짝 눌리는 중",
+                    statusJp: "マーゴのペースに少し押され気味",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "mago",
+                    guestChar: "mago",
+                    guestExpr: "pensive",
+                    text: "＊ [マーゴ] ねぇ、ノアちゃんの描く\n   蝶ブローチ…最近街のショップ\n   でも人気らしいわよ♡欲しいな♪",
+                    statusKr: "마고가 나비 기모노를 쓰다듬으며 미소",
+                    statusJp: "マーゴが蝶の着物を撫でて微笑む",
+                  },
+                  {
+                    expr: "flustered",
+                    speaker: "mago",
+                    guestChar: "mago",
+                    guestExpr: "flushed",
+                    text: "＊ [マーゴ] 気が向いたから特別に\n   明日の運勢を占ってあげるわね♡\n   もちろん有料の$49よ。ウフフ♡",
+                    statusKr: "마고가 장난스레 윙크하며 $49 요구!",
+                    statusJp: "マーゴが冗談めかして$49を請求！",
+                  },
+                  {
+                    expr: "angry",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ 『ぼったくるな！』\n   ……それにしても奴、本当に人の\n   嘘や本心を見抜いているのか？",
+                    statusKr: "마고의 통찰력을 은근히 경계하는 중",
+                    statusJp: "マーゴの洞察力を密かに警戒中",
+                  },
+                ],
+              },
+              {
+                title: "素人カメラは断る！",
+                steps: [
+                  {
+                    expr: "sleeve_pout",
+                    speaker: "anan",
+                    guestChar: null,
+                    guest2Char: null,
+                    text: "＊ この店は静かな読書と執筆の為\n   の聖域である。騒々しい輩は\n   出入り禁止と決まっているのだ。",
+                    statusKr: "상점 수칙을 읊으며 정숙을 유지",
+                    statusJp: "店のルールを掲げて静寂を保つ",
+                  },
+                  {
+                    expr: "surprised",
+                    speaker: "coco",
+                    guestChar: "coco",
+                    guestExpr: "smile",
+                    guest2Char: null,
+                    text: "＊ [ココ] え〜硬いこと言うなよー！\n   あてぃしが素敵なお店のPR動画\n   バッチリ撮ってあげるってば〜！",
+                    statusKr: "코코가 카메라를 들고 불쑥 끼어듦!",
+                    statusJp: "ココがカメラを構えて割り込み！",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "mago",
+                    guestChar: "coco",
+                    guestExpr: "normal",
+                    guest2Char: "mago",
+                    guest2Expr: "normal",
+                    text: "＊ [マーゴ] あら、賑やかな声が聞こえ\n   たと思えば…ココちゃん、また\n   カメラでみんなを困らせてるの？",
+                    statusKr: "마고가 구경하듯 3번째로 난입!",
+                    statusJp: "マーゴが面白そうに3人目として登場！",
+                  },
+                  {
+                    expr: "smug",
+                    speaker: "coco",
+                    guestChar: "coco",
+                    guestExpr: "smile",
+                    guest2Char: "mago",
+                    guest2Expr: "surprised",
+                    ananX: -1.52,
+                    guestX: 0.36,
+                    guest2X: 1.48,
+                    text: "＊ [ココ] おっマーゴちゃんナイス！\n   パープル姉妹のコラボ回だぞっ♪\n   はいチーズ！レンズ見てみて〜！",
+                    statusKr: "코코가 마고 쪽으로 바짝 들이댐!",
+                    statusJp: "ココがマーゴにぐいぐい接近！",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "mago",
+                    guestChar: "coco",
+                    guestExpr: "cry",
+                    guest2Char: "mago",
+                    guest2Expr: "pensive",
+                    ananX: -1.48,
+                    guestX: -0.22,
+                    guest2X: 1.56,
+                    text: "＊ [マーゴ] ……素人の固定カメラ\n   じゃない？低画質で私の美貌\n   を撮ろうなんてお断りよ♡",
+                    statusKr: "마고가 우아하게 피하며 한 방 먹임!",
+                    statusJp: "マーゴが華麗にかわして切り返す！",
+                  },
+                  {
+                    expr: "angry",
+                    speaker: "anan",
+                    guestChar: "coco",
+                    guestExpr: "fearful",
+                    guest2Char: "mago",
+                    guest2Expr: "smile",
+                    ananX: -1.48,
+                    guestX: -0.02,
+                    guest2X: 1.48,
+                    text: "＊ [アンアン] 『撮影は全面禁止だ!!』\n   店の品格が下がるではないか！\n   ココはさっさと機材をしまえ！",
+                    statusKr: "안안이 스케치북으로 렌즈를 막음",
+                    statusJp: "アンアンがスケッチブックで阻止中",
+                  },
+                  {
+                    expr: "proud_blush",
+                    speaker: "anan",
+                    guestChar: null,
+                    guest2Char: null,
+                    text: "＊ ……結局マーゴに一喝され\n   てココは逃げてしまったな。\n   まあ掛け合いは少し笑えたぞ。",
+                    statusKr: "시끌벅적했던 소동 뒤에 피식 웃음",
+                    statusJp: "騒がしい嵐の後で思わず苦笑",
+                  },
+                ],
+              },
+              {
+                title: "▸ 次の話題へ (7/9)",
+                isNextPage: true,
+              },
+            ],
+            [
+              {
+                title: "マスク越しの不器用な優しさ",
+                steps: [
+                  {
+                    expr: "calm",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ ……黒いフードを深く被った奴が\n   扉の前を行ったり来たりしておる。\n   用があるなら名を名乗るがいい。",
+                    statusKr: "문틈 너머 검은 후드를 발견함",
+                    statusJp: "扉の外の黒いフードに気づく",
+                  },
+                  {
+                    expr: "surprised",
+                    speaker: "arisa",
+                    guestChar: "arisa",
+                    guestExpr: "angry",
+                    text: "＊ [アリサ] チッ…紫藤アリサだ。\n   おめーらと慣れ合うつもりはねー！\n   ただ道を間違えただけだろうが！",
+                    statusKr: "시토 아리사가 까칠하게 경계 중!",
+                    statusJp: "紫藤アリサが警戒しながら登場！",
+                  },
+                  {
+                    expr: "sketchbook",
+                    speaker: "anan",
+                    guestChar: "arisa",
+                    guestExpr: "normal",
+                    text: "＊ [アンアン] 『発火魔法は厳禁だ』\n   それより先程からスケッチブック\n   ばかり見ておるが…絵が好みか？",
+                    statusKr: "안안이 아리사의 시선을 눈치챔",
+                    statusJp: "アンアンがアリサの視線に気づく",
+                  },
+                  {
+                    expr: "smug",
+                    speaker: "arisa",
+                    guestChar: "arisa",
+                    guestExpr: "flushed",
+                    text: "＊ [アリサ] なっ、何言ってんだ？！\n   別に見入ってたわけじゃねーよ！\n   ただ線が綺麗だと思っただけだ…！",
+                    statusKr: "아리사가 마스크 위로 귀까지 새빨개짐",
+                    statusJp: "アリサがマスク越しに真っ赤になる",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "arisa",
+                    guestChar: "arisa",
+                    guestExpr: "pensive",
+                    text: "＊ [アリサ] 俺はこの魔法が嫌い。\n   全部焼き尽くしちまうから…\n   お前も絵、大事にしとけよ。",
+                    statusKr: "아리사가 시선을 내리고 진심을 전함",
+                    statusJp: "アリサが伏し目がちに本音を漏らす",
+                  },
+                  {
+                    expr: "proud_blush",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ ……言葉は荒いが、根は誰よりも\n   他者を傷つけたくない不器用な奴\n   なのかもしれぬな。",
+                    statusKr: "떠난 아리사의 말에 마음을 놓음",
+                    statusJp: "立ち去ったアリサの優しさに微笑む",
+                  },
+                ],
+              },
+              {
+                title: "消えた髪リボンのミステリー",
+                steps: [
+                  {
+                    expr: "one_sleeve",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ …………。\n＊ 『静かな夕暮れ時に、誰かが\n   扉の前を行き来しておるな』",
+                    statusKr: "문밖의 기척에 고개를 돌림",
+                    statusJp: "扉の前の気配に気づく",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "nanoka",
+                    guestChar: "nanoka",
+                    guestExpr: "normal",
+                    text: "＊ [ナノカ] …こんばんは、アンアン。\n   黒の髪リボン見かけなかった？\n   カフェに忘れたのかもしれない。",
+                    statusKr: "나노카가 잃어버린 리본을 찾음",
+                    statusJp: "ナノカが失くしたリボンを捜索中",
+                  },
+                  {
+                    expr: "flustered",
+                    speaker: "anan",
+                    guestChar: "nanoka",
+                    guestExpr: "pensive",
+                    text: "＊ [アンアン] 『わがはいは知らぬ』\n   まさかコレクション用にこっそり\n   頂戴したとでも疑っておるのか？",
+                    statusKr: "안안이 스케치북으로 결백을 알림",
+                    statusJp: "アンアンが筆談で潔白を主張中",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "nanoka",
+                    guestChar: "nanoka",
+                    guestExpr: "angry",
+                    text: "＊ [ナノカ] 別に疑ってはないわ。\n   昼に一緒にお茶した時、お盆の\n   隣に置いた気がして確認よ。",
+                    statusKr: "나노카가 기억을 더듬어 보는 중",
+                    statusJp: "ナノカが記憶を辿っている",
+                  },
+                  {
+                    expr: "surprised",
+                    speaker: "nanoka",
+                    guestChar: "nanoka",
+                    guestExpr: "flushed",
+                    text: "＊ [ナノカ] ……あ。自分のコート\n   のポケットに入っていたみたい。\n   騒がせてごめんね、アンアン。",
+                    statusKr: "주머니에서 리본을 찾고 사과함",
+                    statusJp: "ポケットで見つけて謝罪中",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "nanoka",
+                    guestChar: "nanoka",
+                    guestExpr: "smile",
+                    text: "＊ [ナノカ] お詫びに珈琲奢るわ。\n   あと…新作が完成したら、今度も\n   私に一番乗りで読ませてね。",
+                    statusKr: "나노카가 옅게 웃으며 약조함",
+                    statusJp: "ナノカが微かに笑って約束を残す",
+                  },
+                  {
+                    expr: "proud_blush",
+                    speaker: "anan",
+                    guestChar: null,
+                    text: "＊ ……不器用だが誰より義理堅く\n   優しいヤツだ。第一号の読者席\n   くらい、空けておいてやろう。",
+                    statusKr: "첫 독자 예약에 은근히 뿌듯해함",
+                    statusJp: "第一号読者の予約に満足げ",
+                  },
+                ],
+              },
+              {
+                title: "書店内で火花は厳禁だ！",
+                steps: [
+                  {
+                    expr: "sketchbook",
+                    speaker: "anan",
+                    guestChar: null,
+                    guest2Char: null,
+                    text: "＊ 夜風が随分と冷えてきたな。\n   『だが紙束の山だらけの店内では\n   小さな火の粉すら厳禁である』",
+                    statusKr: "스케치북에 화기 엄금 팻말을 씀",
+                    statusJp: "スケッチブックに火気厳禁と書く",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "nanoka",
+                    guestChar: "nanoka",
+                    guestExpr: "normal",
+                    guest2Char: null,
+                    text: "＊ [ナノカ] 火の元注意は賛成よ。\n   さっき路地の方から焦げ臭い\n   匂いがしたから見にきたの。",
+                    statusKr: "나노카가 냄새를 쫓아 상점에 들어옴",
+                    statusJp: "ナノカが異変を追って入室した",
+                  },
+                  {
+                    expr: "angry",
+                    speaker: "arisa",
+                    guestChar: "nanoka",
+                    guestExpr: "pensive",
+                    guest2Char: "arisa",
+                    guest2Expr: "angry",
+                    text: "＊ [アリサ] あぁ！？火遊びじゃねぇ!\n   焼鳥が少し焦げただけでいちいち\n   見回りに来んなってんだよ！！",
+                    statusKr: "아리사가 발끈하며 3번째로 난입!",
+                    statusJp: "アリサが苛立ちながら乱入！",
+                  },
+                  {
+                    expr: "flustered",
+                    speaker: "nanoka",
+                    guestChar: "nanoka",
+                    guestExpr: "surprised",
+                    guest2Char: "arisa",
+                    guest2Expr: "surprised",
+                    ananX: -1.50,
+                    guestX: 0.36,
+                    guest2X: 1.48,
+                    text: "＊ [ナノカ] でもここは紙が多いわ、\n   紫藤アリサ。袖から火花も少し\n   散ってるし…まず一息ついて。",
+                    statusKr: "나노카가 제지하려 아리사 쪽으로 이동",
+                    statusJp: "ナノカが制止しようと一歩踏み出す",
+                  },
+                  {
+                    expr: "surprised",
+                    speaker: "arisa",
+                    guestChar: "nanoka",
+                    guestExpr: "normal",
+                    guest2Char: "arisa",
+                    guest2Expr: "flushed",
+                    ananX: -1.48,
+                    guestX: -0.18,
+                    guest2X: 1.62,
+                    text: "＊ [アリサ] うるせぇな！お前まで\n   お節介焼きみたいに言いやがって!\n   火種はもう消したから寄んなっ！",
+                    statusKr: "아리사가 당황하며 오른쪽으로 물러남",
+                    statusJp: "アリサが照れ隠しに右へ飛び退く",
+                  },
+                  {
+                    expr: "angry",
+                    speaker: "anan",
+                    guestChar: "nanoka",
+                    guestExpr: "pensive",
+                    guest2Char: "arisa",
+                    guest2Expr: "pensive",
+                    ananX: -1.48,
+                    guestX: -0.02,
+                    guest2X: 1.48,
+                    text: "＊ [アンアン] 『両方とも没収だぞ！』\n   焦げ臭さも火花も持ち込み厳禁！\n   わがはいの原稿に煤が付いたら罰!",
+                    statusKr: "원고를 사수하며 둘을 동시 진압!",
+                    statusJp: "原稿を守るため二人を一喝！",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "anan",
+                    guestChar: null,
+                    guest2Char: null,
+                    text: "＊ …結局二人は口を噤んで大人\n   しく引き下がった。口は荒いが\n   本音では店を案じていたな。",
+                    statusKr: "평온을 되찾은 상점을 정리 중",
+                    statusJp: "平穏を取り戻しほっと一息つく",
+                  },
+                ],
+              },
+              {
+                title: "▸ 次の話題へ (8/9)",
+                isNextPage: true,
+              },
+            ],
+            [
+              {
+                title: "[乱入] ホラー脚本朗読会",
+                steps: [
+                  {
+                    expr: "smug",
+                    speaker: "anan",
+                    guestChar: null,
+                    guest2Char: null,
+                    text: "＊ よし…新作ホラーのクライマックス\n   を声に出して推敲するとしよう！\n   「漆黒の廊下の奥から紅い手が…」",
+                    statusKr: "자신만만하게 공포 소설을 낭독 중",
+                    statusJp: "自信満々にホラー小説を朗読中",
+                  },
+                  {
+                    expr: "surprised",
+                    speaker: "coco",
+                    guestChar: "coco",
+                    guestExpr: "fearful",
+                    guest2Char: null,
+                    text: "＊ [ココ] ぎゃあああ！？なっ、何だ\n   今の呪いの人形みたいな台詞は！！\n   あてぃしホラー無理なんだってば！！",
+                    statusKr: "코코가 비명을 지르며 놀라서 난입!",
+                    statusJp: "ココが悲鳴を上げて飛び込んでくる！",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "hiro",
+                    guestChar: "coco",
+                    guestExpr: "cry",
+                    guest2Char: "hiro",
+                    guest2Expr: "arms_normal",
+                    ananX: -1.52,
+                    guestX: 0.36,
+                    guest2X: 1.48,
+                    text: "＊ [ヒロ] 騒がしいぞ、沢渡ココ。\n   悲鳴が店の外まで響いていたぞ。\n   一体何を読み上げていたんだ？",
+                    statusKr: "근처 지나던 히로가 소란에 등장!",
+                    statusJp: "通り掛かりのヒロが騒ぎで登場！",
+                  },
+                  {
+                    expr: "flustered",
+                    speaker: "coco",
+                    guestChar: "coco",
+                    guestExpr: "cry",
+                    guest2Char: "hiro",
+                    guest2Expr: "arms_surprised",
+                    ananX: -1.48,
+                    guestX: 0.72,
+                    guest2X: 1.48,
+                    text: "＊ [ココ] ふぇーんヒロちゃん助けて！\n   アンアンちゃんが怖い話読むから\n   夜トイレ行けなくなるよぉーっ！！",
+                    statusKr: "코코가 히로 곁으로 후다닥 숨음!",
+                    statusJp: "ココがヒロの影へ慌てて逃げ込む！",
+                  },
+                  {
+                    expr: "calm",
+                    speaker: "hiro",
+                    guestChar: "coco",
+                    guestExpr: "pensive",
+                    guest2Char: "hiro",
+                    guest2Expr: "pensive",
+                    ananX: -1.48,
+                    guestX: -0.02,
+                    guest2X: 1.48,
+                    text: "＊ [ヒロ] 落ち着け。原稿は……ほう。\n   アンアン、前回よりも恐怖描写の\n   緩急がずっと鋭くなっているな。",
+                    statusKr: "히로가 뜻밖에 진지한 평론을 남김",
+                    statusJp: "ヒロが意外にも真剣な批評をする",
+                  },
+                  {
+                    expr: "proud_blush",
+                    speaker: "anan",
+                    guestChar: null,
+                    guest2Char: null,
+                    text: "＊ ふん！読者の悲鳴を引き出せた\n   なら大成功だな！ヒロの高評価も\n   悪くない気分である！",
+                    statusKr: "작가로서 뿌듯하게 펜을 세움",
+                    statusJp: "ホラー作家として満足げな様子",
+                  },
+                ],
+              },
+              {
+                title: "[乱入] 包帯と小さな温もり",
+                steps: [
+                  {
+                    expr: "worried",
+                    speaker: "anan",
+                    guestChar: null,
+                    guest2Char: null,
+                    text: "＊ そういえば……皆それぞれ、\n   不器用な意地や照れ隠しの一つも\n   抱えながら日々を歩んでおるな。",
+                    statusKr: "친구들의 서툰 다정함을 떠올림",
+                    statusJp: "少女たちの優しさを静かに想う",
+                  },
+                  {
+                    expr: "angry",
+                    speaker: "arisa",
+                    guestChar: "arisa",
+                    guestExpr: "pensive",
+                    guest2Char: null,
+                    text: "＊ [アリサ] なあ…ここに$49の包帯\n   とか売ってねーのか？べ、別に蚊に\n   刺された所に貼りたいだけで……。",
+                    statusKr: "아리사가 시선을 돌리며 붕대를 찾음",
+                    statusJp: "アリサが視線を逸らして包帯を探す",
+                  },
+                  {
+                    expr: "wide_eyes",
+                    speaker: "nanoka",
+                    guestChar: "arisa",
+                    guestExpr: "surprised",
+                    guest2Char: "nanoka",
+                    guest2Expr: "normal",
+                    ananX: -1.50,
+                    guestX: -0.02,
+                    guest2X: 1.12,
+                    text: "＊ [ナノカ] 手首の擦り傷、見えて\n   いたわよ。はい、予備の包帯なら\n   余っているから。綺麗な新品よ。",
+                    statusKr: "나노카가 다가와 여분 붕대를 건넴",
+                    statusJp: "ナノカが近づき予備の包帯を差し出す",
+                  },
+                  {
+                    expr: "flustered",
+                    speaker: "arisa",
+                    guestChar: "arisa",
+                    guestExpr: "flushed",
+                    guest2Char: "nanoka",
+                    guest2Expr: "smile",
+                    ananX: -1.54,
+                    guestX: -0.34,
+                    guest2X: 1.46,
+                    text: "＊ [アリサ] うっ！誰が頼んだよ！\n   勝手に押し付けやがって……\n   悪くねぇな……ありがとな。",
+                    statusKr: "아리사가 살짝 비키며 수줍게 받음",
+                    statusJp: "アリサが照れつつ少し身を引く",
+                  },
+                  {
+                    expr: "sketchbook",
+                    speaker: "anan",
+                    guestChar: "arisa",
+                    guestExpr: "flushed",
+                    guest2Char: "nanoka",
+                    guest2Expr: "smile",
+                    ananX: -1.48,
+                    guestX: -0.02,
+                    guest2X: 1.48,
+                    text: "＊ [アンアン] 『素直に礼を言えば\n   良かろうに』わがはいの店には金で\n   買えぬ温もりも置いてあるのだな。",
+                    statusKr: "스케치북에 훈훈한 일침을 남김",
+                    statusJp: "スケッチブックで微笑ましいツッコミ",
+                  },
+                  {
+                    expr: "proud_blush",
+                    speaker: "anan",
+                    guestChar: null,
+                    guest2Char: null,
+                    text: "＊ ……こうして軽口を叩きつつ\n   今宵も同じ街を笑い歩ける仲間が\n   いるというのは、実に心強いな。",
+                    statusKr: "함께 있는 친구들을 흐뭇하게 봄",
+                    statusJp: "今を共にする仲間に微笑む",
                   },
                 ],
               },
@@ -2935,8 +4449,8 @@
             {
               expr: "sketchbook",
               text: "＊ 『わがはいに構うな。\n   喋りかけるな』",
-              statusKr: "독방의 고독 속으로 돌아가는 중",
-              statusJp: "独房の静寂へ戻ろうとしている",
+              statusKr: "자신만의 고독 속으로 돌아가는 중",
+              statusJp: "自室の静寂へ戻ろうとしている",
             },
             {
               expr: "nervous_hide",
@@ -3444,6 +4958,54 @@
             { wave: "square", freq: 855, to: 945, a: 0.002, d: 0.015, mix: 0.20, hp: 500, lp: 2600 },
           ],
         },
+        // Cool deadpan detective pulse for Nanoka
+        voiceNanoka: {
+          vary: 1.4, gain: 0.30,
+          layers: [
+            { wave: "triangle", freq: 332, to: 312, a: 0.002, d: 0.034, shape: 2.2, hp: 180, lp: 1850 },
+            { wave: "square", duty: 0.38, freq: 498, to: 472, a: 0.002, d: 0.016, mix: 0.18, hp: 360, lp: 1900 },
+          ],
+        },
+        // Velvet teasing witch chime for Mago
+        voiceMago: {
+          vary: 2.0, gain: 0.34,
+          layers: [
+            { wave: "triangle", freq: 376, to: 356, a: 0.003, d: 0.038, shape: 1.9, hp: 170, lp: 1950 },
+            { wave: "sine", freq: 564, to: 540, a: 0.002, d: 0.026, mix: 0.30 },
+          ],
+        },
+        // Fiery raspy punk spark for Arisa
+        voiceArisa: {
+          vary: 2.4, gain: 0.30,
+          layers: [
+            { wave: "square", duty: 0.28, freq: 392, to: 364, a: 0.002, d: 0.030, shape: 2.3, drive: 0.5, hp: 220, lp: 2300 },
+            { wave: "triangle", freq: 196, to: 182, a: 0.002, d: 0.028, mix: 0.32, lp: 1200 },
+          ],
+        },
+        // Warm bright heroine blossom blip for Ema
+        voiceEma: {
+          vary: 2.8, gain: 0.28,
+          layers: [
+            { wave: "triangle", freq: 512, to: 552, a: 0.002, d: 0.033, shape: 2.3, hp: 240, lp: 2650 },
+            { wave: "sine", freq: 768, to: 828, a: 0.002, d: 0.020, mix: 0.25 },
+          ],
+        },
+        // High-energy streamer sparkle blip for Coco
+        voiceCoco: {
+          vary: 4.2, gain: 0.25,
+          layers: [
+            { wave: "triangle", freq: 650, to: 718, a: 0.001, d: 0.029, shape: 2.5, hp: 340, lp: 3300 },
+            { wave: "square", duty: 0.42, freq: 975, to: 1080, a: 0.002, d: 0.015, mix: 0.22, hp: 580, lp: 3000 },
+          ],
+        },
+        // Resolute sharp crimson-blade blip for Hiro
+        voiceHiro: {
+          vary: 1.5, gain: 0.31,
+          layers: [
+            { wave: "triangle", freq: 454, to: 428, a: 0.002, d: 0.032, shape: 2.3, hp: 210, lp: 2350 },
+            { wave: "square", duty: 0.35, freq: 681, to: 642, a: 0.002, d: 0.015, mix: 0.19, hp: 420, lp: 2200 },
+          ],
+        },
       };
 
       function getCachedSfxBuffer(type, variantIdx) {
@@ -3489,6 +5051,9 @@
           bgmAudio.addEventListener("play", () => {
             state.bgmPlaying = true;
             state.bgmPendingAutoplay = false;
+            if (audioCtx && audioCtx.state === "running" && !mediaSourceAttached) {
+              initAudio(true);
+            }
             updateAudioHud();
           });
           bgmAudio.addEventListener("pause", () => {
@@ -3530,23 +5095,37 @@
         if (audioCtx && audioCtx.state === "suspended") {
           audioCtx.resume().catch(() => {});
         }
+        // Only attach MediaElementAudioSourceNode when AudioContext is running (or resume succeeds),
+        // so browser autoplay rules never mute the <audio> element or freeze the spectrum bars.
         if (attachMediaGraph && audioCtx && bgmAudio && !mediaSourceAttached) {
-          try {
-            const srcNode = audioCtx.createMediaElementSource(bgmAudio);
-            analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 256;
-            analyser.smoothingTimeConstant = 0.78;
-            freqData = new Uint8Array(analyser.frequencyBinCount);
-            srcNode.connect(analyser);
-            analyser.connect(audioCtx.destination);
-            mediaSourceAttached = true;
-          } catch (_) {}
+          const bindMediaGraph = () => {
+            if (!audioCtx || !bgmAudio || mediaSourceAttached) return;
+            try {
+              const srcNode = audioCtx.createMediaElementSource(bgmAudio);
+              analyser = audioCtx.createAnalyser();
+              analyser.fftSize = 512;
+              analyser.minDecibels = -76;
+              analyser.maxDecibels = -18;
+              analyser.smoothingTimeConstant = 0.72;
+              freqData = new Uint8Array(analyser.frequencyBinCount);
+              srcNode.connect(analyser);
+              analyser.connect(audioCtx.destination);
+              mediaSourceAttached = true;
+            } catch (_) {}
+          };
+          if (audioCtx.state === "running") {
+            bindMediaGraph();
+          } else {
+            audioCtx.resume().then(() => {
+              if (audioCtx && audioCtx.state === "running") bindMediaGraph();
+            }).catch(() => {});
+          }
         }
       }
 
-      // Eagerly unlock Web Audio on any first gesture so the very first click's SFX never gets dropped!
+      // Eagerly unlock Web Audio + attach BGM analyser on any first user gesture!
       (["pointerdown", "keydown", "touchend"]).forEach((evt) => {
-        window.addEventListener(evt, () => initAudio(false), { capture: true, passive: true });
+        window.addEventListener(evt, () => initAudio(Boolean(bgmAudio)), { capture: true, passive: true });
       });
 
       function resolveVoiceSfxType(opts) {
@@ -3555,6 +5134,12 @@
         if (spk === "milia") return "voiceMilia";
         if (spk === "hanna") return "voiceHanna";
         if (spk === "sherry") return "voiceSherry";
+        if (spk === "nanoka") return "voiceNanoka";
+        if (spk === "mago") return "voiceMago";
+        if (spk === "arisa") return "voiceArisa";
+        if (spk === "ema") return "voiceEma";
+        if (spk === "coco") return "voiceCoco";
+        if (spk === "hiro") return "voiceHiro";
         const expr = opts && opts.expr ? opts.expr : state.expression;
         if (opts && opts.isSketchQuote) return "voiceSketch";
         if (expr === "angry" || expr === "surprised" || expr === "flustered" || expr === "wide_eyes" || expr === "nervous_hide") {
@@ -3622,6 +5207,9 @@
             p.then(() => {
               state.bgmPlaying = true;
               state.bgmPendingAutoplay = false;
+              if (audioCtx && audioCtx.state === "running" && !mediaSourceAttached) {
+                initAudio(true);
+              }
               updateAudioHud();
             }).catch(() => {
               state.bgmPlaying = false;
@@ -4128,6 +5716,76 @@
             flushed:   loadTexture("char_sherry_flushed", "assets/char_sherry_flushed.png", false),
             smile:     loadTexture("char_sherry_smile", "assets/char_sherry_smile.png", false),
           },
+          nanoka: {
+            normal:    loadTexture("char_nanoka_normal", "assets/char_nanoka_normal.png", false),
+            smile:     loadTexture("char_nanoka_smile", "assets/char_nanoka_smile.png", false),
+            angry:     loadTexture("char_nanoka_angry", "assets/char_nanoka_angry.png", false),
+            surprised: loadTexture("char_nanoka_surprised", "assets/char_nanoka_surprised.png", false),
+            flushed:   loadTexture("char_nanoka_flushed", "assets/char_nanoka_flushed.png", false),
+            pensive:   loadTexture("char_nanoka_pensive", "assets/char_nanoka_pensive.png", false),
+            cry:       loadTexture("char_nanoka_cry", "assets/char_nanoka_cry.png", false),
+            fearful:   loadTexture("char_nanoka_fearful", "assets/char_nanoka_fearful.png", false),
+          },
+          mago: {
+            normal:    loadTexture("char_mago_normal", "assets/char_mago_normal.png", false),
+            smile:     loadTexture("char_mago_smile", "assets/char_mago_smile.png", false),
+            angry:     loadTexture("char_mago_angry", "assets/char_mago_angry.png", false),
+            surprised: loadTexture("char_mago_surprised", "assets/char_mago_surprised.png", false),
+            flushed:   loadTexture("char_mago_flushed", "assets/char_mago_flushed.png", false),
+            pensive:   loadTexture("char_mago_pensive", "assets/char_mago_pensive.png", false),
+            cry:       loadTexture("char_mago_cry", "assets/char_mago_cry.png", false),
+            fearful:   loadTexture("char_mago_fearful", "assets/char_mago_fearful.png", false),
+          },
+          arisa: {
+            normal:    loadTexture("char_arisa_normal", "assets/char_arisa_normal.png", false),
+            smile:     loadTexture("char_arisa_smile", "assets/char_arisa_smile.png", false),
+            angry:     loadTexture("char_arisa_angry", "assets/char_arisa_angry.png", false),
+            surprised: loadTexture("char_arisa_surprised", "assets/char_arisa_surprised.png", false),
+            flushed:   loadTexture("char_arisa_flushed", "assets/char_arisa_flushed.png", false),
+            pensive:   loadTexture("char_arisa_pensive", "assets/char_arisa_pensive.png", false),
+            cry:       loadTexture("char_arisa_cry", "assets/char_arisa_cry.png", false),
+            fearful:   loadTexture("char_arisa_fearful", "assets/char_arisa_fearful.png", false),
+          },
+          ema: {
+            normal:     loadTexture("char_ema_normal", "assets/char_ema_normal.png", false),
+            normal2:    loadTexture("char_ema_normal2", "assets/char_ema_normal2.png", false),
+            determined: loadTexture("char_ema_determined", "assets/char_ema_determined.png", false),
+            smile:      loadTexture("char_ema_smile", "assets/char_ema_smile.png", false),
+            angry:      loadTexture("char_ema_angry", "assets/char_ema_angry.png", false),
+            surprised:  loadTexture("char_ema_surprised", "assets/char_ema_surprised.png", false),
+            flushed:    loadTexture("char_ema_flushed", "assets/char_ema_flushed.png", false),
+            pensive:    loadTexture("char_ema_pensive", "assets/char_ema_pensive.png", false),
+            cry:        loadTexture("char_ema_cry", "assets/char_ema_cry.png", false),
+            fearful:    loadTexture("char_ema_fearful", "assets/char_ema_fearful.png", false),
+          },
+          coco: {
+            normal:    loadTexture("char_coco_normal", "assets/char_coco_normal.png", false),
+            smile:     loadTexture("char_coco_smile", "assets/char_coco_smile.png", false),
+            angry:     loadTexture("char_coco_angry", "assets/char_coco_angry.png", false),
+            surprised: loadTexture("char_coco_surprised", "assets/char_coco_surprised.png", false),
+            flushed:   loadTexture("char_coco_flushed", "assets/char_coco_flushed.png", false),
+            pensive:   loadTexture("char_coco_pensive", "assets/char_coco_pensive.png", false),
+            cry:       loadTexture("char_coco_cry", "assets/char_coco_cry.png", false),
+            fearful:   loadTexture("char_coco_fearful", "assets/char_coco_fearful.png", false),
+          },
+          hiro: {
+            normal:         loadTexture("char_hiro_normal", "assets/char_hiro_normal.png", false),
+            smile:          loadTexture("char_hiro_smile", "assets/char_hiro_smile.png", false),
+            angry:          loadTexture("char_hiro_angry", "assets/char_hiro_angry.png", false),
+            surprised:      loadTexture("char_hiro_surprised", "assets/char_hiro_surprised.png", false),
+            flushed:        loadTexture("char_hiro_flushed", "assets/char_hiro_flushed.png", false),
+            pensive:        loadTexture("char_hiro_pensive", "assets/char_hiro_pensive.png", false),
+            cry:            loadTexture("char_hiro_cry", "assets/char_hiro_cry.png", false),
+            fearful:        loadTexture("char_hiro_fearful", "assets/char_hiro_fearful.png", false),
+            arms_normal:    loadTexture("char_hiro_arms_normal", "assets/char_hiro_arms_normal.png", false),
+            arms_smile:     loadTexture("char_hiro_arms_smile", "assets/char_hiro_arms_smile.png", false),
+            arms_angry:     loadTexture("char_hiro_arms_angry", "assets/char_hiro_arms_angry.png", false),
+            arms_surprised: loadTexture("char_hiro_arms_surprised", "assets/char_hiro_arms_surprised.png", false),
+            arms_flushed:   loadTexture("char_hiro_arms_flushed", "assets/char_hiro_arms_flushed.png", false),
+            arms_pensive:   loadTexture("char_hiro_arms_pensive", "assets/char_hiro_arms_pensive.png", false),
+            arms_cry:       loadTexture("char_hiro_arms_cry", "assets/char_hiro_arms_cry.png", false),
+            arms_fearful:   loadTexture("char_hiro_arms_fearful", "assets/char_hiro_arms_fearful.png", false),
+          },
         },
         uiFrame: loadTexture("ui_frame", "assets/ui_frame.png", true),
         spriteAsterisk: loadTexture("sprite_asterisk", "assets/sprite_asterisk.png", true),
@@ -4596,6 +6254,9 @@
       }
 
       function startDialogueSequence(steps) {
+        if (state.shopMode !== "MESSAGE") {
+          state.dialogueReturnMode = state.shopMode === "BUY" ? "BUY" : (state.shopMode === "TALK" ? "TALK" : "MAIN");
+        }
         const list = Array.isArray(steps) ? steps.slice() : [steps];
         const firstGuest = list.length > 0 ? list[0].guestChar : null;
         const firstGuest2 = list.length > 0 ? list[0].guest2Char : null;
@@ -4743,19 +6404,10 @@
         }
       }
 
-      function updateDossierStatus(statusKr, statusJp, praiseDelta = 0) {
-        state.praiseScore = Math.max(10, Math.min(100, state.praiseScore + praiseDelta));
+      function updateDossierStatus(statusKr, statusJp) {
         const statusEl = document.getElementById("anan-status-text");
         if (statusEl) {
           statusEl.textContent = state.lang === "KR" ? statusKr : statusJp;
-        }
-        const pctEl = document.getElementById("praise-pct");
-        if (pctEl) pctEl.textContent = `${state.praiseScore}%`;
-        const barEl = document.getElementById("praise-bar");
-        if (barEl) {
-          const blocks = barEl.querySelectorAll("span");
-          const filled = Math.round(state.praiseScore / 10);
-          blocks.forEach((b, idx) => b.classList.toggle("on", idx < filled));
         }
       }
 
@@ -4922,8 +6574,8 @@
       }
 
       function cancelShopSelection() {
-        if (!state.powerOn) return;
-        if (state.shopMode !== "MAIN") {
+        if (!state.powerOn || state.pendingAutoPowerOff) return;
+        if (state.shopMode === "MESSAGE") {
           playSfx("back");
           state.dialogueQueue = [];
           state.guestChar = null;
@@ -4932,9 +6584,32 @@
           state.stepGuestX = null;
           state.stepGuest2X = null;
           state.activeSpeaker = "anan";
+          state.shopMode = state.dialogueReturnMode || "MAIN";
+          state.dialogueReturnMode = "MAIN";
+          state.uiCanvasDirty = true;
+          setExpression("default");
+        } else if (state.shopMode === "TALK") {
+          playSfx("back");
+          if (state.talkPage > 0) {
+            state.talkPage--;
+            state.subCursor = 0;
+          } else {
+            state.shopMode = "MAIN";
+          }
+          state.uiCanvasDirty = true;
+          setExpression("default");
+        } else if (state.shopMode === "BUY") {
+          playSfx("back");
           state.shopMode = "MAIN";
           state.uiCanvasDirty = true;
           setExpression("default");
+        } else if (state.shopMode === "MAIN") {
+          if (state.mainCursor !== 3) {
+            state.mainCursor = 3;
+            state.showMainKrSub = true;
+            state.uiCanvasDirty = true;
+            playSfx("move");
+          }
         }
       }
 
@@ -4980,11 +6655,11 @@
         state.pendingAutoPowerOff = false;
         state.autoPowerOffTimer = 0;
         state.shopMode = "MAIN";
+        state.dialogueReturnMode = "MAIN";
         state.showMainKrSub = false;
         state.mainCursor = 0;
         state.talkPage = 0;
         state.gold = 49;
-        state.praiseScore = 70;
         SHOP_DATA.KR.items.forEach((it) => { it.bought = false; });
         SHOP_DATA.JP.items.forEach((it) => { it.bought = false; });
         state.uiCanvasDirty = true;
@@ -5206,13 +6881,25 @@
       const mvpMat = Mat4.create();
       const spectrumBars = document.querySelectorAll("#bgm-spectrum span");
 
+      const spectrumBinRanges = [
+        [1, 2], [2, 3], [3, 5], [5, 7], [7, 10], [10, 14], [14, 19],
+        [19, 26], [26, 35], [35, 47], [47, 63], [63, 84], [84, 112], [112, 148],
+      ];
+
       function updateSpectrumBars() {
         if (!spectrumBars.length) return;
-        if (state.bgmPlaying && analyser && freqData && state.bgmVol > 0.01) {
+        const isPlayingAudio = Boolean(bgmAudio && !bgmAudio.paused) || state.bgmPlaying;
+        if (isPlayingAudio && analyser && freqData && state.bgmVol > 0.01) {
           for (let i = 0; i < spectrumBars.length; i++) {
-            const bin = Math.min(freqData.length - 1, 2 + i * 3);
-            const v = freqData[bin] / 255;
-            const pct = Math.max(14, Math.min(100, Math.round(v * 100)));
+            const [b0, b1] = spectrumBinRanges[i] || [i * 2, i * 2 + 2];
+            let peak = 0;
+            for (let b = b0; b < Math.min(freqData.length, b1); b++) {
+              if (freqData[b] > peak) peak = freqData[b];
+            }
+            // Shape raw FFT byte [0..255] with natural dynamic curve so peaks dance without pinning all bars at 100%
+            const norm = peak / 255;
+            const shaped = Math.pow(norm, 1.35);
+            const pct = Math.max(10, Math.min(100, Math.round(10 + shaped * 90)));
             spectrumBars[i].style.height = `${pct}%`;
           }
         } else {
@@ -5284,11 +6971,15 @@
         }
         gl.viewport(0, 0, cw, ch);
 
-        if (state.bgmPlaying && analyser && freqData) {
+        const isBgmActiveNow = Boolean(bgmAudio && !bgmAudio.paused) || state.bgmPlaying;
+        if (isBgmActiveNow && !mediaSourceAttached && audioCtx && audioCtx.state === "running") {
+          initAudio(true);
+        }
+        if (isBgmActiveNow && analyser && freqData) {
           analyser.getByteFrequencyData(freqData);
           let bassSum = 0;
-          for (let i = 1; i <= 10; i++) bassSum += freqData[i];
-          const normBass = bassSum / (10 * 255);
+          for (let i = 1; i <= 16; i++) bassSum += freqData[i];
+          const normBass = bassSum / (16 * 255);
           state.beatEnergy = state.beatEnergy * 0.78 + normBass * 0.22;
         } else {
           state.beatEnergy *= 0.9;
@@ -6144,7 +7835,15 @@
         } else if (e.code === "KeyZ" || e.code === "Enter" || e.code === "Space") {
           e.preventDefault();
           confirmShopSelection();
-        } else if (e.code === "KeyX" || e.code === "Escape" || e.code === "ShiftLeft" || e.code === "ShiftRight") {
+        } else if (
+          e.code === "KeyX" ||
+          e.key === "x" ||
+          e.key === "X" ||
+          e.key === "ㅌ" ||
+          e.code === "Escape" ||
+          e.code === "ShiftLeft" ||
+          e.code === "ShiftRight"
+        ) {
           e.preventDefault();
           cancelShopSelection();
         } else if (e.code === "KeyR") {
@@ -6678,7 +8377,8 @@
           cancelAnimationFrame(rafId);
           if (fromUser) {
             playSfx("boot");
-            if (state.bgmPendingAutoplay && !state.bgmUserMuted && state.powerOn) {
+            initAudio(Boolean(bgmAudio));
+            if ((!state.bgmPlaying || !mediaSourceAttached) && !state.bgmUserMuted && state.powerOn) {
               toggleBgm(true, true);
               syncAllSettingsUi();
             }

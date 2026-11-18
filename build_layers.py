@@ -642,10 +642,10 @@ def main() -> None:
     }
     (ASSETS_DIR / "metrics.json").write_text(json.dumps(metrics, indent=2), encoding="utf-8")
 
-    # Pixelize & nocturnally grade guest characters (Noah & Miria) matching Natsume Anan
+    # Pixelize & nocturnally grade all 10 guest characters (Noah, Miria, Hannah, Sherry + Nanoka, Mago, Arisa, Ema, Coco, Hiro)
     guest_asset_names = build_guest_pixel_sprites(ASSETS_DIR)
 
-    # Rebuild embedded_assets.js (using lavender-graded char_full.png + 14 expressions + 10 guest sprites + Dolly Zoom layers)
+    # Rebuild embedded_assets.js (using lavender-graded char_full.png + 14 expressions + all guest sprites + Dolly Zoom layers)
     files = [
         "layer_sky_bg.png",
         "layer_sky_bg_ext.png",
@@ -780,6 +780,9 @@ def _grade_guest_character(bgr_dot: np.ndarray, alpha_dot: np.ndarray, profile: 
 
     # Balanced luminous contrast curve: rich cel darks without blowing skin/hair out to chalk white
     v = v_ch.copy()
+    shadow_lift = float(profile.get("shadow_lift", 0.0))
+    if shadow_lift > 0.0:
+        v = np.where(v > 0.01, np.clip(v * (1.0 - shadow_lift) + shadow_lift, 0.0, 1.0), v)
     v_crushed = np.where(
         v < 0.20,
         (np.maximum(v, 0.0) / 0.20) ** 1.45 * 0.14,
@@ -854,13 +857,22 @@ def _finalize_crt_pixel_sprite(
     return bgr_to_rgba_padded(bgr_1920, alpha_1920, pad_iters=4)
 
 
+def _read_bgra_unicode(path: Path) -> np.ndarray | None:
+    """Decode PNG from any Unicode/Korean file path safely on Windows."""
+    if not path.exists():
+        return None
+    buf = np.fromfile(str(path), dtype=np.uint8)
+    return cv2.imdecode(buf, cv2.IMREAD_UNCHANGED)
+
+
 def build_guest_pixel_sprites(assets_dir: Path) -> list[str]:
     src_roots = [
         assets_dir / "src_guests",
+        Path(r"C:\Users\ab010\Downloads\마노사바펜게임프로젝트\캐릭터"),
         Path(r"C:\Users\ab010\.gemini\antigravity\brain\1462d919-8923-4634-ae38-b3c6cf95cff5\scratch\extracted_chars"),
     ]
-    src_root = next((p for p in src_roots if p.exists()), None)
-    if src_root is None:
+    existing_roots = [p for p in src_roots if p.exists()]
+    if not existing_roots:
         raise FileNotFoundError("Guest character source directory not found.")
 
     profiles = {
@@ -868,6 +880,25 @@ def build_guest_pixel_sprites(assets_dir: Path) -> list[str]:
         "milia":  {"sat_boost": 1.26, "shadow_blue": 26.0},
         "hanna":  {"sat_boost": 1.26, "shadow_blue": 26.0},
         "sherry": {"sat_boost": 1.26, "shadow_blue": 32.0},
+        "nanoka": {"sat_boost": 1.24, "shadow_blue": 38.0, "shadow_lift": 0.040},
+        "mago":   {"sat_boost": 1.34, "shadow_blue": 36.0, "shadow_lift": 0.032},
+        "arisa":  {"sat_boost": 1.32, "shadow_blue": 26.0, "shadow_lift": 0.034},
+        "ema":    {"sat_boost": 1.30, "shadow_blue": 30.0, "shadow_lift": 0.016},
+        "coco":   {"sat_boost": 1.34, "shadow_blue": 26.0, "shadow_lift": 0.026},
+        "hiro":   {"sat_boost": 1.32, "shadow_blue": 28.0, "shadow_lift": 0.030},
+    }
+
+    kr_dir_alias = {
+        "noah": "노아",
+        "milia": "미리아",
+        "hanna": "한나",
+        "sherry": "셰리",
+        "nanoka": "나노카",
+        "mago": "마고",
+        "arisa": "아리사",
+        "ema": "에마",
+        "coco": "코코",
+        "hiro": "히로",
     }
 
     guest_specs = [
@@ -894,17 +925,86 @@ def build_guest_pixel_sprites(assets_dir: Path) -> list[str]:
         ("char_sherry_surprised.png","sherry/Sherry_Surprised1_1794843580529.png",0.630, 14,  806.5, "sherry"),
         ("char_sherry_flushed.png",  "sherry/Sherry_Flushed1_1794843607550.png",0.630,  14,  629.5, "sherry"),
         ("char_sherry_smile.png",    "sherry/Sherry_Smile1_1794843542662.png",  0.630,  14,  629.5, "sherry"),
+        # --- New 6 Characters: Nanoka, Mago, Arisa, Ema, Coco, Hiro ---
+        ("char_nanoka_normal.png",    "nanoka/Nanoka_Normal1_1795019556568.png",    0.720, 14, 682.0, "nanoka"),
+        ("char_nanoka_smile.png",     "nanoka/Nanoka_Smile1_1795019557705.png",     0.720, 14, 682.0, "nanoka"),
+        ("char_nanoka_angry.png",     "nanoka/Nanoka_Angry1_1795019558974.png",     0.720, 14, 682.0, "nanoka"),
+        ("char_nanoka_surprised.png", "nanoka/Nanoka_Surprised1_1795019565373.png", 0.720, 14, 682.0, "nanoka"),
+        ("char_nanoka_flushed.png",   "nanoka/Nanoka_Flushed1_1795019562764.png",   0.720, 14, 682.0, "nanoka"),
+        ("char_nanoka_pensive.png",   "nanoka/Nanoka_Pensive1_1795019704707.png",   0.720, 14, 682.0, "nanoka"),
+        ("char_nanoka_cry.png",       "nanoka/Nanoka_Cry1_1795019560265.png",       0.720, 14, 682.0, "nanoka"),
+        ("char_nanoka_fearful.png",   "nanoka/Nanoka_Fearful1_1795019561561.png",   0.720, 14, 682.0, "nanoka"),
+        ("char_mago_normal.png",      "mago/Margo_Normal1_1795019619027.png",       0.615, 16, 849.0, "mago"),
+        ("char_mago_smile.png",       "mago/Margo_Smile1_1795019620247.png",        0.615, 16, 829.0, "mago"),
+        ("char_mago_angry.png",       "mago/Margo_Angry1_1795019621334.png",        0.615, 16, 829.0, "mago"),
+        ("char_mago_surprised.png",   "mago/Margo_Surprised1_1795019626671.png",    0.615, 16, 829.0, "mago"),
+        ("char_mago_flushed.png",     "mago/Margo_Flushed1_1795019624471.png",      0.615, 16, 829.0, "mago"),
+        ("char_mago_pensive.png",     "mago/Margo_Pensive1_1795019625594.png",      0.615, 16, 829.0, "mago"),
+        ("char_mago_cry.png",         "mago/Margo_Cry1_1795019622279.png",          0.615, 16, 829.0, "mago"),
+        ("char_mago_fearful.png",     "mago/Margo_Fearful1_1795019623397.png",      0.615, 16, 829.0, "mago"),
+        ("char_arisa_normal.png",     "arisa/Alisa_Normal1_1795019542970.png",      0.605, 38, 808.0, "arisa"),
+        ("char_arisa_smile.png",      "arisa/Alisa_Smile1_1795019544552.png",       0.605, 38, 808.0, "arisa"),
+        ("char_arisa_angry.png",      "arisa/Alisa_Angry1_1795019546250.png",       0.605, 38, 808.0, "arisa"),
+        ("char_arisa_surprised.png",  "arisa/Alisa_Surprised1_1795019554942.png",   0.605, 38, 808.0, "arisa"),
+        ("char_arisa_flushed.png",    "arisa/Alisa_Flushed1_1795019551432.png",     0.605, 38, 808.0, "arisa"),
+        ("char_arisa_pensive.png",    "arisa/Alisa_Pensive1_1795019553149.png",     0.605, 38, 808.0, "arisa"),
+        ("char_arisa_cry.png",        "arisa/Alisa_Cry1_1795019548093.png",         0.605, 38, 808.0, "arisa"),
+        ("char_arisa_fearful.png",    "arisa/Alisa_Fearful1_1795019549779.png",     0.605, 38, 808.0, "arisa"),
+        ("char_ema_normal.png",       "ema/Ema_Normal1_1795019519212.png",          0.580, 34, 725.0, "ema"),
+        ("char_ema_normal2.png",      "ema/Ema_Normal2_1795019527703.png",          0.580, 34, 725.0, "ema"),
+        ("char_ema_determined.png",   "ema/Ema_Determined2_1795019526815.png",      0.580, 34, 561.0, "ema"),
+        ("char_ema_smile.png",        "ema/Ema_Smile1_1795019520496.png",           0.580, 34, 625.0, "ema"),
+        ("char_ema_angry.png",        "ema/Ema_Angry1_1795019521360.png",           0.580, 34, 561.0, "ema"),
+        ("char_ema_surprised.png",    "ema/Ema_Surprised1_1795019525933.png",       0.580, 34, 585.0, "ema"),
+        ("char_ema_flushed.png",      "ema/Ema_Flushed1_1795019524137.png",         0.580, 34, 501.0, "ema"),
+        ("char_ema_pensive.png",      "ema/Ema_Pensive1_1795019525044.png",         0.580, 34, 501.0, "ema"),
+        ("char_ema_cry.png",          "ema/Ema_Cry1_1795019522313.png",             0.580, 34, 501.0, "ema"),
+        ("char_ema_fearful.png",      "ema/Ema_Fearful1_1795019523223.png",         0.580, 34, 629.0, "ema"),
+        ("char_coco_normal.png",      "coco/Coco_Normal1_1795019529771.png",        0.585, 24, 691.0, "coco"),
+        ("char_coco_smile.png",       "coco/Coco_Smile1_1795019531636.png",         0.585, 24, 779.0, "coco"),
+        ("char_coco_angry.png",       "coco/Coco_Angry1_1795019533476.png",         0.585, 24, 691.0, "coco"),
+        ("char_coco_surprised.png",   "coco/Coco_Surprised1_1795019541303.png",     0.585, 24, 691.0, "coco"),
+        ("char_coco_flushed.png",     "coco/Coco_Flushed1_1795019538400.png",       0.585, 24, 691.0, "coco"),
+        ("char_coco_pensive.png",     "coco/Coco_Pensive1_1795019539895.png",       0.585, 24, 691.0, "coco"),
+        ("char_coco_cry.png",         "coco/Coco_Cry1_1795019535296.png",           0.585, 24, 691.0, "coco"),
+        ("char_coco_fearful.png",     "coco/Coco_Fearful1_1795019536910.png",       0.585, 24, 691.0, "coco"),
+        ("char_hiro_normal.png",      "hiro/Hiro_Normal1_1795019567153.png",        0.725, 24, 629.0, "hiro"),
+        ("char_hiro_smile.png",       "hiro/Hiro_Smile1_1795019568460.png",         0.725, 24, 629.0, "hiro"),
+        ("char_hiro_angry.png",       "hiro/Hiro_Angry1_1795019569896.png",         0.725, 24, 629.0, "hiro"),
+        ("char_hiro_surprised.png",   "hiro/Hiro_Surprised1_1795019577087.png",     0.725, 24, 929.0, "hiro"),
+        ("char_hiro_flushed.png",     "hiro/Hiro_Flushed1_1795019574379.png",       0.725, 24, 629.0, "hiro"),
+        ("char_hiro_pensive.png",     "hiro/Hiro_Pensive1_1795019575721.png",       0.725, 24, 629.0, "hiro"),
+        ("char_hiro_cry.png",         "hiro/Hiro_Cry1_1795019571536.png",           0.725, 24, 629.0, "hiro"),
+        ("char_hiro_fearful.png",     "hiro/Hiro_Fearful1_1795019572963.png",       0.725, 24, 629.0, "hiro"),
+        ("char_hiro_arms_normal.png",    "hiro/Hiro_Normal2_1795019578426.png",     0.725, 24, 629.0, "hiro"),
+        ("char_hiro_arms_smile.png",     "hiro/Hiro_Smile2_1795019580482.png",      0.725, 24, 629.0, "hiro"),
+        ("char_hiro_arms_angry.png",     "hiro/Hiro_Angry2_1795019610808.png",      0.725, 24, 629.0, "hiro"),
+        ("char_hiro_arms_surprised.png", "hiro/Hiro_Surprised2_1795019618017.png",  0.725, 24, 929.0, "hiro"),
+        ("char_hiro_arms_flushed.png",   "hiro/Hiro_Flushed2_1795019615384.png",    0.725, 24, 629.0, "hiro"),
+        ("char_hiro_arms_pensive.png",   "hiro/Hiro_Pensive2_1795019616703.png",    0.725, 24, 629.0, "hiro"),
+        ("char_hiro_arms_cry.png",       "hiro/Hiro_Cry2_1795019612520.png",        0.725, 24, 629.0, "hiro"),
+        ("char_hiro_arms_fearful.png",   "hiro/Hiro_Fearful2_1795019614026.png",    0.725, 24, 629.0, "hiro"),
     ]
     out_names: list[str] = []
     for out_name, rel_path, scale, oy_target, head_cx, p_key in guest_specs:
-        src_bgra = cv2.imread(str(src_root / rel_path), cv2.IMREAD_UNCHANGED)
+        char_dir, fname = rel_path.split("/", 1)
+        kr_sub = f"{kr_dir_alias.get(char_dir, char_dir)}/{fname}"
+        src_bgra = None
+        for root in existing_roots:
+            for cand in (root / rel_path, root / kr_sub):
+                if cand.exists():
+                    src_bgra = _read_bgra_unicode(cand)
+                    if src_bgra is not None:
+                        break
+            if src_bgra is not None:
+                break
         if src_bgra is None:
-            raise FileNotFoundError(f"Missing guest sprite: {src_root / rel_path}")
+            raise FileNotFoundError(f"Missing guest sprite: {rel_path}")
         src_rgba = cv2.cvtColor(src_bgra, cv2.COLOR_BGRA2RGBA)
         final_bgra = _finalize_crt_pixel_sprite(src_rgba, scale, oy_target, head_cx, profiles[p_key])
         cv2.imwrite(str(assets_dir / out_name), final_bgra)
         out_names.append(out_name)
-    print(f"Built {len(out_names)} high-res crisp & vivid guest sprites (Noah, Miria, Hannah, Sherry).")
+    print(f"Built {len(out_names)} high-res crisp & vivid guest sprites (10 guests total).")
     return out_names
 
 
